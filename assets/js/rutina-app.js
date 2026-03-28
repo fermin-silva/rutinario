@@ -95,9 +95,32 @@
   var prevBtn = document.querySelector('.week-prev');
   var nextBtn = document.querySelector('.week-next');
   var progressEl = routinePage.querySelector('.routine-progress');
-  var checkboxes = routinePage.querySelectorAll('.exercise-item input[type="checkbox"]');
+  var checklistItems = routinePage.querySelectorAll('.exercise-item[data-state-group]');
+  var exerciseSections = routinePage.querySelectorAll('.exercise-section');
+  var collapsibleSection = routinePage.querySelector('.exercise-section[data-collapsible]');
+  var collapsibleToggle = collapsibleSection && collapsibleSection.querySelector('.section-header');
+  var routineStatus = routinePage.querySelector('.routine-status');
 
   if (!prevBtn || !nextBtn || !weekLabel) return;
+
+  if (collapsibleSection && collapsibleToggle) {
+    var collapsibleToggleIcon = collapsibleToggle.querySelector('.section-toggle-icon');
+
+    function updateCollapsibleSection() {
+      var collapsed = collapsibleSection.classList.contains('is-collapsed');
+      collapsibleToggle.setAttribute('aria-expanded', String(!collapsed));
+      if (collapsibleToggleIcon) {
+        collapsibleToggleIcon.textContent = collapsed ? '⏷' : '⏶';
+      }
+    }
+
+    collapsibleToggle.addEventListener('click', function () {
+      collapsibleSection.classList.toggle('is-collapsed');
+      updateCollapsibleSection();
+    });
+
+    updateCollapsibleSection();
+  }
 
   function getMondayOfWeek(offset) {
     var now = new Date();
@@ -135,14 +158,59 @@
 
   function loadState() {
     try {
-      return JSON.parse(localStorage.getItem(storageKey())) || {};
+      return normalizeState(JSON.parse(localStorage.getItem(storageKey())));
     } catch (e) {
-      return {};
+      return normalizeState(null);
     }
   }
 
   function saveState(state) {
-    localStorage.setItem(storageKey(), JSON.stringify(state));
+    localStorage.setItem(storageKey(), JSON.stringify(normalizeState(state)));
+  }
+
+  function normalizeState(state) {
+    var normalized = {
+      exercises: {},
+      excuses: {}
+    };
+
+    if (!state || typeof state !== 'object') {
+      return normalized;
+    }
+
+    var hasNamespaces = Object.prototype.hasOwnProperty.call(state, 'exercises') ||
+                        Object.prototype.hasOwnProperty.call(state, 'excuses');
+
+    if (hasNamespaces) {
+      if (state.exercises && typeof state.exercises === 'object') {
+        normalized.exercises = state.exercises;
+      }
+      if (state.excuses && typeof state.excuses === 'object') {
+        normalized.excuses = state.excuses;
+      }
+      return normalized;
+    }
+
+    for (var key in state) {
+      if (Object.prototype.hasOwnProperty.call(state, key)) {
+        normalized.exercises[key] = state[key];
+      }
+    }
+
+    return normalized;
+  }
+
+  function getItemGroup(item) {
+    return item.dataset.stateGroup || 'exercises';
+  }
+
+  function hasCheckedItems(items) {
+    for (var key in items) {
+      if (Object.prototype.hasOwnProperty.call(items, key) && items[key]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function loadProgress() {
@@ -172,30 +240,35 @@
     var totalItems = 0;
     var checkedItems = 0;
 
-    for (var i = 0; i < checkboxes.length; i++) {
-      var cb = checkboxes[i];
-      var item = cb.closest('.exercise-item');
-      var key = item.dataset.key;
-      var checked = !!state[key];
-      cb.checked = checked;
+    for (var i = 0; i < checklistItems.length; i++) {
+      var item = checklistItems[i];
+      var checkbox = item.querySelector('input[type="checkbox"]');
+      var group = getItemGroup(item);
+      var checked = !!state[group][item.dataset.key];
+      checkbox.checked = checked;
       item.classList.toggle('checked', checked);
-      totalItems++;
-      if (checked) checkedItems++;
+      if (group === 'exercises') {
+        totalItems++;
+        if (checked) checkedItems++;
+      }
     }
 
-    updateAllProgress(totalItems, checkedItems);
+    updateAllProgress(totalItems, checkedItems, state);
   }
 
-  function updateAllProgress(totalItems, checkedCount) {
-    var sections = routinePage.querySelectorAll('.exercise-section');
-    for (var i = 0; i < sections.length; i++) {
-      var section = sections[i];
-      var items = section.querySelectorAll('.exercise-item');
-      var sectionCheckedItems = section.querySelectorAll('.exercise-item.checked');
+  function updateAllProgress(totalItems, checkedCount, state) {
+    for (var i = 0; i < exerciseSections.length; i++) {
+      var section = exerciseSections[i];
+      var items = section.querySelectorAll('.exercise-item[data-state-group="exercises"]');
+      var sectionCheckedItems = section.querySelectorAll('.exercise-item[data-state-group="exercises"].checked');
       var counter = section.querySelector('.progress-counter');
       if (counter) {
         counter.textContent = sectionCheckedItems.length + ' / ' + items.length;
       }
+    }
+
+    if (routineStatus) {
+      routineStatus.classList.toggle('has-excuse', hasCheckedItems(state.excuses));
     }
 
     if (progressEl) {
@@ -213,6 +286,9 @@
         });
       }
       progressEl.textContent = pct + '%';
+      if (routineStatus) {
+        routineStatus.classList.toggle('is-complete', total > 0 && checked === total);
+      }
     }
   }
 
@@ -228,18 +304,20 @@
     }
   });
 
-  for (var i = 0; i < checkboxes.length; i++) {
-    checkboxes[i].addEventListener('change', function () {
-      var item = this.closest('.exercise-item');
-      var key = item.dataset.key;
-      var state = loadState();
+  routinePage.addEventListener('change', function (e) {
+    var target = e.target;
+    if (!target || target.type !== 'checkbox') return;
 
-      state[key] = this.checked;
-      saveState(state);
+    var item = target.closest('.exercise-item[data-state-group]');
+    if (!item) return;
 
-      render();
-    });
-  }
+    var state = loadState();
+    var group = getItemGroup(item);
+    state[group][item.dataset.key] = target.checked;
+    saveState(state);
+
+    render();
+  });
 
   var deferredPrompt = null;
   var installBtn = document.createElement('button');

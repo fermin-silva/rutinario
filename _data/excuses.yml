@@ -1,0 +1,15 @@
+- id: work
+  en: Work
+  es: Trabajo
+- id: sick-injury
+  en: Sick / injury
+  es: Enfermedad / lesión
+- id: social-event
+  en: Social event
+  es: Evento social
+- id: travel-holidays
+  en: Travel / holidays
+  es: Viaje / vacaciones
+- id: other
+  en: Other
+  es: Otro

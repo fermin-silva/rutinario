@@ -6,6 +6,9 @@ section_exercises:
 week_label:
   en: Week
   es: Semana
+section_excuses:
+  en: Excuses
+  es: Excusas
 ---
 
 <div class="routine-page" data-slug="{{ page.slug }}"
@@ -35,6 +38,8 @@ week_label:
     {% endfor %}
   </div>
   {% endif %}
+
+  {% assign excuses = site.data.excuses %}
 
   {% assign has_groups = false %}
   {% for item in page.exercises %}
@@ -70,14 +75,7 @@ week_label:
         {% assign ex_es = item.es | default: item %}
         {% assign ex_id = item.id | default: ex_en | slugify %}
         {% assign data_key = page.slug | append: "__" | append: ex_id %}
-        <label class="exercise-item" data-key="{{ data_key }}">
-          <input type="checkbox" />
-          <span class="custom-checkbox"></span>
-          <span class="exercise-name"
-                data-i18n-en="{{ ex_en }}"
-                data-i18n-es="{{ ex_es }}">{{ ex_en }}</span>
-          <span class="check-icon">&#10003;</span>
-        </label>
+        {% include rutina-checklist-item.html data_key=data_key state_group='exercises' label_en=ex_en label_es=ex_es %}
       {% endif %}
     {% endfor %}
     {% if group_open %}</div></div>{% endif %}
@@ -98,18 +96,31 @@ week_label:
             {% assign ex_es = item.es | default: item %}
             {% assign ex_id = item.id | default: ex_en | slugify %}
             {% assign data_key = page.slug | append: "__" | append: ex_id %}
-            <label class="exercise-item" data-key="{{ data_key }}">
-              <input type="checkbox" />
-              <span class="custom-checkbox"></span>
-              <span class="exercise-name"
-                    data-i18n-en="{{ ex_en }}"
-                    data-i18n-es="{{ ex_es }}">{{ ex_en }}</span>
-              <span class="check-icon">&#10003;</span>
-            </label>
+            {% include rutina-checklist-item.html data_key=data_key state_group='exercises' label_en=ex_en label_es=ex_es %}
           {% endif %}
         {% endfor %}
       </div>
     </div>
 
+  {% endif %}
+
+  {% if excuses and excuses.size > 0 %}
+  <div class="exercise-section is-collapsed" data-section="excuses" data-collapsible="true">
+    <button class="section-header"
+            type="button"
+            aria-expanded="false"
+            aria-controls="excuses-list">
+      <span class="section-label"
+            data-i18n-en="{{ layout.section_excuses.en }}"
+            data-i18n-es="{{ layout.section_excuses.es }}">{{ layout.section_excuses.en }}</span>
+      <span class="section-toggle-icon" aria-hidden="true">⏷</span>
+    </button>
+    <div class="exercise-list" id="excuses-list">
+      {% for excuse in excuses %}
+        {% assign excuse_id = excuse.id | default: excuse.en | slugify %}
+        {% include rutina-checklist-item.html data_key=excuse_id state_group='excuses' label_en=excuse.en label_es=excuse.es %}
+      {% endfor %}
+    </div>
+  </div>
   {% endif %}
 </div>
