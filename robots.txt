@@ -1,0 +1,22 @@
+# robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /_*
+Disallow: .git/
+
+User-agent: GPTBot
+User-agent: CCBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+Allow: /
+Allow: /routines/
+
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: Slurp
+Allow: /
+
+Sitemap: https://rutinario.app/sitemap.xml
+
+Crawl-delay: 1

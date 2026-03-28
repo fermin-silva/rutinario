@@ -1,0 +1,108 @@
+---
+layout: rutina-default
+title:
+  en: "Rutinario"
+  es: "Rutinario"
+
+subtitle:
+  en: "Track your workouts and routines week by week. No login, no install."
+  es: "Registrá tus entrenamientos y rutinas semana a semana. Sin login ni instalar nada."
+
+section_routines:
+  en: Gym Routines
+  es: Rutinas Gim
+card_exercises:
+  en: exercises
+  es: ejercicios
+card_days:
+  en: days
+  es: "días"
+card_groups:
+  en: groups
+  es: grupos
+
+section_how_it_works:
+  en: How It Works
+  es: Cómo Funciona
+
+how_it_works_steps:
+  - title:
+      en: "1. Pick a gym routine"
+      es: "1. Elegí una rutina de gimnasio"
+    desc:
+      en: <p>Choose a workout routine from the list. Each one is structured by day or muscle group — no guessing what to train each session.</p>
+      es: <p>Elegí una rutina de entrenamiento de la lista. Cada una está organizada por día o grupo muscular, sin tener que adivinar qué entrenar cada sesión.</p>
+
+  - title:
+      en: "2. Track exercises week by week"
+      es: "2. Registrá ejercicios semana a semana"
+    desc:
+      en: <p>Tap any exercise to mark it done. Each week resets automatically so you always start fresh — previous weeks are saved for reference.</p>
+      es: <p>Tocá un ejercicio para marcarlo como hecho. Cada semana se reinicia automáticamente para que siempre empieces de cero — las semanas anteriores quedan guardadas.</p>
+
+  - title:
+      en: "3. Review your workout history"
+      es: "3. Revisá tu historial de entrenamientos"
+    desc:
+      en: <p>Browse past weeks to see your training history. Helps you adjust weight, spot missed sessions, or confirm you've been consistent.</p>
+      es: <p>Navegá por semanas anteriores para ver tu historial de entrenamiento. Útil para ajustar el peso, detectar sesiones que te saltaste o confirmar que estás siendo constante.</p>
+
+  - title:
+      en: "4. Install as an app — no account needed"
+      es: "4. Instalala como app — sin cuenta"
+    desc:
+      en: <p>Rutinario works offline and requires no login. If you train regularly, open your routine and install it to your home screen for quick access. All data stays on your device.</p>
+      es: <p>Rutinario funciona sin conexión y no requiere registro. Si entrenás seguido, abrí tu rutina e instalala en la pantalla de inicio para acceder rápido. Todos los datos quedan en tu dispositivo.</p>
+---
+
+<div class="hero">
+  <h1 class="hero-title"
+      data-i18n-en="{{ page.title.en }}"
+      data-i18n-es="{{ page.title.es }}">
+    {{ page.title.en }}
+  </h1>
+  <p class="hero-subtitle"
+     data-i18n-en="{{ page.subtitle.en }}"
+     data-i18n-es="{{ page.subtitle.es }}">
+    {{ page.subtitle.en }}
+  </p>
+</div>
+
+<div class="section">
+  <h2 class="section-label"
+      data-i18n-en="{{ page.section_routines.en }}"
+      data-i18n-es="{{ page.section_routines.es }}">
+    {{ page.section_routines.en }}
+  </h2>
+  <div class="content-list">
+  {% for routine in site.routines %}
+    <a href="{{ routine.url | relative_url }}" class="content-item">
+      <div class="content-item-title"
+          data-i18n-en="{{ routine.name.en | default: routine.name }}"
+          data-i18n-es="{{ routine.name.es | default: routine.name }}">
+        {{ routine.name.en | default: routine.name }}
+      </div>
+      <div class="content-item-desc">
+        {% if routine.type == "flat" %}
+          <span data-i18n-en="{{ routine.exercises | size }} {{ page.card_exercises.en }}"
+                data-i18n-es="{{ routine.exercises | size }} {{ page.card_exercises.es }}">
+            {{ routine.exercises | size }} {{ page.card_exercises.en }}
+          </span>
+        {% elsif routine.type == "by_day" %}
+          <span data-i18n-en="{{ routine.days | size }} {{ page.card_days.en }}"
+                data-i18n-es="{{ routine.days | size }} {{ page.card_days.es }}">
+            {{ routine.days | size }} {{ page.card_days.en }}
+          </span>
+        {% elsif routine.type == "by_group" %}
+          <span data-i18n-en="{{ routine.groups | size }} {{ page.card_groups.en }}"
+                data-i18n-es="{{ routine.groups | size }} {{ page.card_groups.es }}">
+            {{ routine.groups | size }} {{ page.card_groups.en }}
+          </span>
+        {% endif %}
+      </div>
+    </a>
+  {% endfor %}
+  </div>
+</div>
+
+{% include info-steps.html title=page.section_how_it_works steps=page.how_it_works_steps %}

@@ -1,0 +1,34 @@
+{% comment %}
+  Renders a titled list of steps with bilingual (en/es) support.
+
+  Usage:
+    {% include info-steps.html title=page.section_how_it_works steps=page.how_it_works_steps %}
+
+  Params:
+    title  — { en, es } object for the section heading
+    steps  — array of { title: { en, es }, desc: { en, es } }
+{% endcomment %}
+<div class="section section--spaced">
+  <h2 class="section-label"
+      data-i18n-en="{{ include.title.en }}"
+      data-i18n-es="{{ include.title.es }}">
+    {{ include.title.en }}
+  </h2>
+
+  <div class="info-steps">
+    {% for step in include.steps %}
+    <div class="info-step">
+      <h3 class="info-step-title"
+          data-i18n-en="{{ step.title.en }}"
+          data-i18n-es="{{ step.title.es }}">
+        {{ step.title.en }}
+      </h3>
+      <div class="info-step-desc"
+           data-i18n-en="{{ step.desc.en }}"
+           data-i18n-es="{{ step.desc.es }}">
+        {{ step.desc.en }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>

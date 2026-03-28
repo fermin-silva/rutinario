@@ -1,0 +1,7 @@
+{% assign percentage_logo = include.percentage_logo | default: page['percentage-logo'] | default: 'muscle' %}
+{% case percentage_logo %}
+{% when 'yoga' %}
+  {% include rutina-percentage-symbols/yoga.html %}
+{% else %}
+  {% include rutina-percentage-symbols/muscle.html %}
+{% endcase %}

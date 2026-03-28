@@ -1,0 +1,20 @@
+title: Rutinario
+description: Bilingual gym routine tracker
+url: "https://rutinario.app"
+baseurl: ""
+
+collections:
+  routines:
+    output: true
+    permalink: /routines/:slug/
+
+defaults:
+  - scope: { path: "", type: routines }
+    values:
+      layout: rutina-routine
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+exclude: [Gemfile, Gemfile.lock, README.md]

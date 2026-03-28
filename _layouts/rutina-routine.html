@@ -1,0 +1,115 @@
+---
+layout: rutina-default
+section_exercises:
+  en: Exercises
+  es: Ejercicios
+week_label:
+  en: Week
+  es: Semana
+---
+
+<div class="routine-page" data-slug="{{ page.slug }}"
+     data-name-en="{{ page.name.en | default: page.name }}"
+     data-name-es="{{ page.name.es | default: page.name }}"
+     data-week-label-en="{{ layout.week_label.en }}"
+     data-week-label-es="{{ layout.week_label.es }}">
+
+  <div class="routine-header">
+    <h1 class="routine-title"
+        data-i18n-en="{{ page.name.en | default: page.name }}"
+        data-i18n-es="{{ page.name.es | default: page.name }}">
+      {{ page.name.en | default: page.name }}
+    </h1>
+    <div class="routine-status" aria-live="polite">
+      {% assign percentage_logo = page['percentage-logo'] | default: 'muscle' %}
+      {% include rutina-percentage-symbols.html percentage_logo=percentage_logo %}
+      <span class="routine-progress">0%</span>
+    </div>
+  </div>
+  {% if page.desc %}
+  <div class="routine-desc truncated">
+    {% for p in page.desc %}
+    <p class="routine-subtitle"
+       data-i18n-en="{{ p.en }}"
+       data-i18n-es="{{ p.es }}">{{ p.en }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% assign has_groups = false %}
+  {% for item in page.exercises %}
+    {% if item.group %}{% assign has_groups = true %}{% break %}{% endif %}
+  {% endfor %}
+
+  {% if has_groups %}
+
+    {% assign group_open = false %}
+    {% for item in page.exercises %}
+      {% if item.group %}
+        {% if group_open %}</div></div>{% endif %}
+        {% assign grp_en = item.group.en | default: item.group %}
+        {% assign grp_es = item.group.es | default: item.group %}
+        {% assign grp_slug = grp_en | slugify %}
+        <div class="exercise-section" data-section="{{ grp_slug }}">
+          <div class="section-header">
+            <span class="section-label"
+                  data-i18n-en="{{ grp_en }}"
+                  data-i18n-es="{{ grp_es }}">{{ grp_en }}</span>
+            <span class="progress-counter" data-progress="{{ grp_slug }}"></span>
+          </div>
+          <div class="exercise-list">
+        {% assign group_open = true %}
+      {% elsif item.label %}
+        {% assign lbl_en = item.label.en | default: item.label %}
+        {% assign lbl_es = item.label.es | default: item.label %}
+        <div class="exercise-label"
+             data-i18n-en="{{ lbl_en }}"
+             data-i18n-es="{{ lbl_es }}">{{ lbl_en }}</div>
+      {% else %}
+        {% assign ex_en = item.en | default: item %}
+        {% assign ex_es = item.es | default: item %}
+        {% assign ex_id = item.id | default: ex_en | slugify %}
+        {% assign data_key = page.slug | append: "__" | append: ex_id %}
+        <label class="exercise-item" data-key="{{ data_key }}">
+          <input type="checkbox" />
+          <span class="custom-checkbox"></span>
+          <span class="exercise-name"
+                data-i18n-en="{{ ex_en }}"
+                data-i18n-es="{{ ex_es }}">{{ ex_en }}</span>
+          <span class="check-icon">&#10003;</span>
+        </label>
+      {% endif %}
+    {% endfor %}
+    {% if group_open %}</div></div>{% endif %}
+
+  {% else %}
+
+    <div class="exercise-section" data-section="all">
+      <div class="exercise-list">
+        {% for item in page.exercises %}
+          {% if item.label %}
+            {% assign lbl_en = item.label.en | default: item.label %}
+            {% assign lbl_es = item.label.es | default: item.label %}
+            <div class="exercise-label"
+                 data-i18n-en="{{ lbl_en }}"
+                 data-i18n-es="{{ lbl_es }}">{{ lbl_en }}</div>
+          {% else %}
+            {% assign ex_en = item.en | default: item %}
+            {% assign ex_es = item.es | default: item %}
+            {% assign ex_id = item.id | default: ex_en | slugify %}
+            {% assign data_key = page.slug | append: "__" | append: ex_id %}
+            <label class="exercise-item" data-key="{{ data_key }}">
+              <input type="checkbox" />
+              <span class="custom-checkbox"></span>
+              <span class="exercise-name"
+                    data-i18n-en="{{ ex_en }}"
+                    data-i18n-es="{{ ex_es }}">{{ ex_en }}</span>
+              <span class="check-icon">&#10003;</span>
+            </label>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+  {% endif %}
+</div>
