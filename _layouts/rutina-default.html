@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{% if page.name.en %}{{ page.name.en }} — {% elsif page.name %}{{ page.name }} — {% endif %}Rutinario</title>
+
+  {% if page.layout == 'rutina-routine' %}{% assign _desc_text = page.desc | map: 'en' | join: ' ' %}{% endif %}
+  <meta name="description" content="{% if page.layout == 'rutina-routine' %}{{ page.name.en | default: page.name }}: {{ _desc_text }}{% else %}Rutinario: Track your gym routines, week by week. Bilingual fitness app with customizable workout tracking.{% endif %}">
+  <meta name="keywords" content="{% if page.layout == 'rutina-routine' %}{{ page.name.en | default: page.name | downcase }}, gym routine, workout, fitness{% else %}gym tracking, fitness app, workout tracker, exercise log, fitness routine{% endif %}">
+  <meta name="author" content="Fermin Silva">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+
+  <meta property="og:type" content="{% if page.layout == 'rutina-routine' %}article{% else %}website{% endif %}">
+  <meta property="og:title" content="{% if page.name.en %}{{ page.name.en }}{% elsif page.name %}{{ page.name }}{% else %}Rutinario{% endif %} — Gym Routine Tracker">
+  <meta property="og:description" content="{% if page.layout == 'rutina-routine' %}{{ page.name.en | default: page.name }}: {{ _desc_text }}{% else %}Track your gym routines, week by week. A bilingual fitness app for managing workouts.{% endif %}">
+  <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+  <meta property="og:site_name" content="Rutinario">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="{% if page.name.en %}{{ page.name.en }}{% elsif page.name %}{{ page.name }}{% else %}Rutinario{% endif %}">
+  <meta name="twitter:description" content="{% if page.layout == 'rutina-routine' %}{{ _desc_text }}{% else %}Track your gym routines with Rutinario - a bilingual PWA fitness tracker{% endif %}">
+
+  <link rel="canonical" href="{{ site.url }}{{ page.url }}">
+  <link rel="alternate" type="text/html" href="{{ site.url }}/">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/base.css' | relative_url }}?v={{ site.time | date: '%s' }}">
+  <link rel="stylesheet" href="{{ '/assets/css/rutina.css' | relative_url }}?v={{ site.time | date: '%s' }}">
+  <link rel="manifest" href="{{ '/manifest.json' | relative_url }}">
+  <meta name="theme-color" content="#e8dcc8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rutinario">
+  <link rel="icon" type="image/svg+xml" href="{{ '/assets/icons/icon-192.svg' | relative_url }}">
+  <script id="i18n-data" type="application/json">{"en":{{ site.data.i18n.en | jsonify }},"es":{{ site.data.i18n.es | jsonify }}}</script>
+
+  {% if page.layout == 'rutina-default' %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Rutinario",
+      "description": "A bilingual PWA for tracking gym routines week by week. Built with Jekyll and vanilla JS.",
+      "url": "{{ site.url }}/",
+      "applicationCategory": "HealthAndFitnessApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Person",
+        "name": "Fermin Silva",
+        "url": "https://fermin-silva.github.io"
+      },
+      "inLanguage": ["en", "es"],
+      "featureList": [
+        "Track multiple gym routines",
+        "Bilingual interface (English/Spanish)",
+        "PWA with offline support",
+        "Responsive mobile design"
+      ]
+    }
+    </script>
+  {% elsif page.layout == 'rutina-routine' %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationEvent",
+      "name": "{{ page.name.en | default: page.name }} Routine",
+      "description": "{{ _desc_text }}",
+      "url": "{{ site.url }}{{ page.url }}",
+      "educationalLevel": "General",
+      "learningResourceType": "Workout",
+      "author": {
+        "@type": "Person",
+        "name": "Fermin Silva"
+      },
+      "isPartOf": {
+        "@type": "SoftwareApplication",
+        "name": "Rutinario",
+        "url": "{{ site.url }}/"
+      }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Collection",
+      "name": "{{ page.name.en | default: page.name }} - Exercise List",
+      "description": "Complete list of exercises in the {{ page.name.en | default: page.name }} routine",
+      "hasPart": [
+        {% for exercise in page.exercises %}
+          {% if exercise.id %}
+          {
+            "@type": "Thing",
+            "name": "{{ exercise.en | default: exercise.es }}"
+            {% if forloop.last %}{% else %},{% endif %}
+          }
+          {% endif %}
+        {% endfor %}
+      ]
+    }
+    </script>
+  {% endif %}
+</head>
+<body>
+  {% include rutina-navbar.html %}
+  {% if page.layout == 'rutina-routine' %}
+    {% include rutina-week-bar.html %}
+  {% endif %}
+  <main class="main-content">
+    {{ content }}
+  </main>
+  <script src="{{ '/assets/js/rutina-app.js' | relative_url }}"></script>
+  <script>
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+    document.documentElement.classList.toggle('standalone', isStandalone);
+  </script>
+</body>
+</html>

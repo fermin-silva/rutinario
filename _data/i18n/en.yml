@@ -1,0 +1,18 @@
+brand: Rutinario
+months:
+  - Jan
+  - Feb
+  - Mar
+  - Apr
+  - May
+  - Jun
+  - Jul
+  - Aug
+  - Sep
+  - Oct
+  - Nov
+  - Dec
+
+install:
+  button: "Add to Home Screen"
+  ios_hint: "Tap <strong>Share ⬆</strong> → <strong>More···</strong> → <strong>Add to Home Screen</strong>"

@@ -1,0 +1,18 @@
+brand: Rutinario
+months:
+  - Ene
+  - Feb
+  - Mar
+  - Abr
+  - May
+  - Jun
+  - Jul
+  - Ago
+  - Sep
+  - Oct
+  - Nov
+  - Dic
+
+install:
+  button: "Agregar a pantalla de inicio"
+  ios_hint: "Toca <strong>Compartir ⬆</strong> → <strong>Más···</strong> → <strong>Agregar a pantalla de inicio</strong>"

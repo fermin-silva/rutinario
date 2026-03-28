@@ -1,0 +1,15 @@
+# Rutinario
+
+> Bilingual workout tracker for gym routines. Built with Jekyll and vanilla JS.
+
+## Pages
+
+- [Home](https://rutinario.app/): App hub with routine list and setup instructions
+- [Full Body Routine](https://rutinario.app/routines/fullbody/): Compound-focused full body routine
+- [Push Pull Legs Routine](https://rutinario.app/routines/ppl/): Three-day split by movement pattern
+
+## Behavior
+
+- Tracks exercise completion in the browser with weekly history
+- Works in English and Spanish
+- Supports installable/offline usage through a manifest and service worker

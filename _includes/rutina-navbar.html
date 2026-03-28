@@ -1,0 +1,26 @@
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="{{ '/' | relative_url }}" class="navbar-brand">Rutinario</a>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+  </div>
+  <ul class="nav-links">
+    {% for routine in site.routines %}
+      <li>
+        <a href="{{ routine.url | relative_url }}"
+           class="nav-link {% if page.slug == routine.slug %}active{% endif %}"
+           data-i18n-en="{{ routine.name.en | default: routine.name }}"
+           data-i18n-es="{{ routine.name.es | default: routine.name }}">
+          {{ routine.name.en | default: routine.name }}
+        </a>
+      </li>
+    {% endfor %}
+    <li class="nav-separator"></li>
+    <li>
+      <button class="nav-link lang-switch" data-i18n-en="ES" data-i18n-es="EN">ES</button>
+    </li>
+  </ul>
+</nav>
