@@ -6,6 +6,9 @@ weekly_title:
 weekly_subtitle:
   en: Last 12 months of routine progress, week by week
   es: Últimos 12 meses del progreso de la rutina, semana a semana
+weekly_month_prefix:
+  en: Weeks
+  es: Semanas
 ---
 {% assign routine = site.routines | where: "slug", page.routine_slug | first %}
 {% assign routine_name_en = routine.name.en | default: routine.name %}
@@ -24,7 +27,9 @@ weekly_subtitle:
      data-name-en="{{ routine_name_en }}"
      data-name-es="{{ routine_name_es }}"
      data-title-suffix-en="{{ layout.weekly_title.en }}"
-     data-title-suffix-es="{{ layout.weekly_title.es }}">
+     data-title-suffix-es="{{ layout.weekly_title.es }}"
+     data-month-prefix-en="{{ layout.weekly_month_prefix.en }}"
+     data-month-prefix-es="{{ layout.weekly_month_prefix.es }}">
   <header class="weekly-header">
     <h1 class="routine-title"
         data-i18n-en="{{ routine_name_en }}"

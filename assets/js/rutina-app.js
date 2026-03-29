@@ -107,6 +107,12 @@
       return addDays(date, diff);
     }
 
+    function getMondayOnOrAfter(date) {
+      var start = startOfDay(date);
+      var monday = getCurrentWeekMonday(start);
+      return monday < start ? addDays(monday, 7) : monday;
+    }
+
     function getWeekMondayFromOffset(baseMonday, offset) {
       return addDays(baseMonday, offset * 7);
     }
@@ -258,25 +264,11 @@
       for (var monthOffset = 0; monthOffset < totalMonths; monthOffset++) {
         var monthStart = new Date(baseDate.getFullYear(), baseDate.getMonth() - monthOffset, 1);
         var monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
-        var firstWeekMonday = getCurrentWeekMonday(monthStart);
+        var firstWeekMonday = getMondayOnOrAfter(monthStart);
+        var lastWeekMonday = getCurrentWeekMonday(monthEnd);
         var weeks = [];
 
-        for (var step = 0; step < 6; step++) {
-          var monday = addDays(firstWeekMonday, step * 7);
-          var sunday = addDays(monday, 6);
-          var intersectsMonth = monday <= monthEnd && sunday >= monthStart;
-
-          if (!intersectsMonth) {
-            if (monday > monthEnd) break;
-            continue;
-          }
-
-          if (monday > currentWeekMonday) {
-            break;
-          }
-
-          if (weeks.length >= 5) break;
-
+        for (var monday = firstWeekMonday; monday <= lastWeekMonday && monday <= currentWeekMonday; monday = addDays(monday, 7)) {
           weeks.push({
             slot: weeks.length + 1,
             monday: monday,
@@ -285,7 +277,7 @@
         }
 
         groups.push({
-          label: formatMonthLabel(monthStart),
+          monthStart: monthStart,
           weeks: weeks
         });
       }
@@ -549,6 +541,10 @@
 
     function renderWeeklyPage() {
       var groups = utils.getRecentMonthGroups(new Date(), 12);
+      var currentWeekIso = utils.getISOWeek(new Date());
+      var monthPrefix = weeklyPage.getAttribute('data-month-prefix-' + currentLocale) ||
+                        weeklyPage.getAttribute('data-month-prefix-en') ||
+                        'Weeks';
       monthsContainer.innerHTML = '';
 
       for (var i = 0; i < groups.length; i++) {
@@ -556,9 +552,10 @@
         var fragment = template.content.cloneNode(true);
         var monthLabel = fragment.querySelector('[data-weekly-month-label]');
         var weekCells = fragment.querySelectorAll('[data-weekly-week]');
+        var monthTitle = monthPrefix + ' ' + utils.formatMonthLabel(group.monthStart).toUpperCase();
 
         if (monthLabel) {
-          monthLabel.textContent = group.label;
+          monthLabel.textContent = monthTitle;
         }
 
         for (var slotIndex = 0; slotIndex < weekCells.length; slotIndex++) {
@@ -573,9 +570,15 @@
           var snapshot = storage.getWeekSnapshot(slug, weekData.isoWeek, totalExercises);
           var startEl = weekCell.querySelector('[data-weekly-week-start]');
           var progressEl = weekCell.querySelector('[data-weekly-week-progress]');
+          var isCurrentWeek = weekData.isoWeek === currentWeekIso;
 
           weekCell.href = routineUrl + '?week=' + encodeURIComponent(weekData.isoWeek);
-          weekCell.setAttribute('aria-label', group.label + ' W' + weekData.slot + ' ' + snapshot.progress.pct + '%');
+          weekCell.setAttribute('aria-label', monthTitle + ' ' + utils.formatShortDate(weekData.monday) + ' ' + snapshot.progress.pct + '%');
+          if (isCurrentWeek) {
+            weekCell.setAttribute('aria-current', 'date');
+          } else {
+            weekCell.removeAttribute('aria-current');
+          }
           applyStatusClasses(weekCell, snapshot.status);
 
           if (startEl) startEl.textContent = utils.formatShortDate(weekData.monday);
