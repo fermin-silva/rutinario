@@ -24,12 +24,6 @@ body {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom));
 }
 
-.main-content-wide {
-  max-width: none;
-  padding-left: 0;
-  padding-right: 0;
-}
-
 .standalone .navbar {
   background: rgba(232, 220, 200, 0.92);
   backdrop-filter: blur(12px);
@@ -277,9 +271,7 @@ a.week-label:hover {
 }
 
 .weekly-header {
-  max-width: var(--max-width);
-  margin: 0 auto 1.25rem;
-  padding: 0 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .weekly-subtitle {
@@ -299,22 +291,23 @@ a.week-label:hover {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
-  border-top: 1px solid var(--beige-300);
-  border-bottom: 1px solid var(--beige-300);
 }
 
 .weekly-week {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.7rem 0.5rem 0.75rem;
-  border-left: 1px solid var(--beige-300);
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem;
+  padding: 0.62rem 0.4rem 0.66rem;
+  border: 1px solid var(--beige-300);
   transition: background 0.15s, color 0.15s;
+  text-align: center;
 }
 
-.weekly-week:first-child {
-  border-left: none;
+.weekly-week + .weekly-week {
+  margin-left: -1px;
 }
 
 .weekly-week:hover {
@@ -327,12 +320,15 @@ a.week-label:hover {
 
 .weekly-month-row > .section-label {
   margin-bottom: 0;
-  padding-right: 1rem;
+  border-bottom: none;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .weekly-week-start,
 .weekly-week-progress {
   display: block;
+  width: 100%;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
