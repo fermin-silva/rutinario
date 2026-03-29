@@ -24,6 +24,12 @@ body {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom));
 }
 
+.main-content-wide {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .standalone .navbar {
   background: rgba(232, 220, 200, 0.92);
   backdrop-filter: blur(12px);
@@ -126,21 +132,27 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.routine-status {
+.routine-status,
+.weekly-week {
   --status-color: var(--ink-light);
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
   color: var(--status-color);
-  white-space: nowrap;
 }
 
-.routine-status.is-complete {
+.routine-status.is-complete,
+.weekly-week.is-complete {
   --status-color: var(--success);
 }
 
-.routine-status.has-excuse:not(.is-complete) {
+.routine-status.has-excuse:not(.is-complete),
+.weekly-week.has-excuse:not(.is-complete) {
   --status-color: #a8544e;
+}
+
+.routine-status {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .routine-status-icon {
@@ -201,6 +213,10 @@ body {
   letter-spacing: 0.01em;
 }
 
+a.week-label:hover {
+  color: var(--ink);
+}
+
 .week-arrow {
   font-size: 1.3rem;
   color: var(--ink-light);
@@ -258,6 +274,87 @@ body {
 
 .exercise-section[data-section="excuses"] .exercise-list {
   margin-top: 0;
+}
+
+.weekly-header {
+  max-width: var(--max-width);
+  margin: 0 auto 1.25rem;
+  padding: 0 1rem;
+}
+
+.weekly-subtitle {
+  margin-top: 0.2rem;
+}
+
+.weekly-month-row {
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+
+.weekly-month-row:last-child {
+  margin-bottom: 0;
+}
+
+.weekly-month-label {
+  margin-bottom: 0;
+  padding-right: 1rem;
+}
+
+.weekly-month-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 1px solid var(--beige-300);
+  border-bottom: 1px solid var(--beige-300);
+}
+
+.weekly-week {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.65rem 0.45rem 0.7rem;
+  border-left: 1px solid var(--beige-300);
+  transition: background 0.15s, color 0.15s;
+}
+
+.weekly-week:first-child {
+  border-left: none;
+}
+
+.weekly-week:hover {
+  background: var(--beige-200);
+}
+
+.weekly-week.is-hidden {
+  display: none;
+}
+
+.weekly-week-slot,
+.weekly-week-start,
+.weekly-week-progress {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weekly-week-slot {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.weekly-week-start {
+  font-size: 0.78rem;
+  color: var(--ink-light);
+}
+
+.weekly-week-progress {
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .section-header {

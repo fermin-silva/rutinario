@@ -11,7 +11,7 @@
     {% for routine in site.routines %}
       <li>
         <a href="{{ routine.url | relative_url }}"
-           class="nav-link {% if page.slug == routine.slug %}active{% endif %}"
+           class="nav-link {% if page.slug == routine.slug or page.routine_slug == routine.slug %}active{% endif %}"
            data-i18n-en="{{ routine.name.en | default: routine.name }}"
            data-i18n-es="{{ routine.name.es | default: routine.name }}">
           {{ routine.name.en | default: routine.name }}

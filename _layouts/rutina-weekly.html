@@ -1,0 +1,46 @@
+---
+layout: rutina-default
+weekly_title:
+  en: Weekly
+  es: Semanal
+weekly_subtitle:
+  en: Last 12 months of routine progress, week by week
+  es: Últimos 12 meses del progreso de la rutina, semana a semana
+---
+{% assign routine = site.routines | where: "slug", page.routine_slug | first %}
+{% assign routine_name_en = routine.name.en | default: routine.name %}
+{% assign routine_name_es = routine.name.es | default: routine.name %}
+{% assign total_exercises = 0 %}
+{% for item in routine.exercises %}
+  {% unless item.group or item.label %}
+    {% assign total_exercises = total_exercises | plus: 1 %}
+  {% endunless %}
+{% endfor %}
+
+<div class="weekly-page"
+     data-slug="{{ routine.slug }}"
+     data-routine-url="{{ routine.url | relative_url }}"
+     data-total-exercises="{{ total_exercises }}"
+     data-name-en="{{ routine_name_en }}"
+     data-name-es="{{ routine_name_es }}"
+     data-title-suffix-en="{{ layout.weekly_title.en }}"
+     data-title-suffix-es="{{ layout.weekly_title.es }}">
+  <header class="weekly-header">
+    <h1 class="routine-title"
+        data-i18n-en="{{ routine_name_en }}"
+        data-i18n-es="{{ routine_name_es }}">
+      {{ routine_name_en }}
+    </h1>
+    <p class="routine-subtitle weekly-subtitle"
+       data-i18n-en="{{ layout.weekly_subtitle.en }}"
+       data-i18n-es="{{ layout.weekly_subtitle.es }}">
+      {{ layout.weekly_subtitle.en }}
+    </p>
+  </header>
+
+  <div class="weekly-months" data-weekly-months></div>
+
+  <template id="weekly-month-row-template">
+    {% include rutina-weekly-month-row.html %}
+  </template>
+</div>

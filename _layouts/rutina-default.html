@@ -3,23 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{% if page.name.en %}{{ page.name.en }} — {% elsif page.name %}{{ page.name }} — {% endif %}Rutinario</title>
+  {% assign _routine_doc = nil %}
+  {% if page.routine_slug %}
+    {% assign _routine_doc = site.routines | where: "slug", page.routine_slug | first %}
+  {% endif %}
+  {% assign _page_name_en = _routine_doc.name.en | default: _routine_doc.name | default: page.name.en | default: page.name %}
+  {% assign _is_routine_page = false %}
+  {% assign _is_weekly_page = false %}
+  {% assign _is_routine_like = false %}
+  {% if page.layout == 'rutina-routine' %}
+    {% assign _is_routine_page = true %}
+    {% assign _is_routine_like = true %}
+  {% endif %}
+  {% if page.layout == 'rutina-weekly' %}
+    {% assign _is_weekly_page = true %}
+    {% assign _is_routine_like = true %}
+  {% endif %}
+  {% assign _title_suffix = '' %}
+  {% if _is_weekly_page %}
+    {% assign _title_suffix = ' — Weekly' %}
+  {% endif %}
+  <title>{% if _page_name_en %}{{ _page_name_en }}{{ _title_suffix }} — {% endif %}Rutinario</title>
 
-  {% if page.layout == 'rutina-routine' %}{% assign _desc_text = page.desc | map: 'en' | join: ' ' %}{% endif %}
-  <meta name="description" content="{% if page.layout == 'rutina-routine' %}{{ page.name.en | default: page.name }}: {{ _desc_text }}{% else %}Rutinario: Track your gym routines, week by week. Bilingual fitness app with customizable workout tracking.{% endif %}">
-  <meta name="keywords" content="{% if page.layout == 'rutina-routine' %}{{ page.name.en | default: page.name | downcase }}, gym routine, workout, fitness{% else %}gym tracking, fitness app, workout tracker, exercise log, fitness routine{% endif %}">
+  {% assign _desc_text = '' %}
+  {% if _is_routine_page %}
+    {% assign _desc_text = page.desc | map: 'en' | join: ' ' %}
+  {% elsif _is_weekly_page and _routine_doc %}
+    {% assign _desc_text = _routine_doc.desc | map: 'en' | join: ' ' %}
+  {% endif %}
+  <meta name="description" content="{% if _is_routine_like %}{{ _page_name_en }}: {{ _desc_text }}{% else %}Rutinario: Track your gym routines, week by week. Bilingual fitness app with customizable workout tracking.{% endif %}">
+  <meta name="keywords" content="{% if _is_routine_like %}{{ _page_name_en | downcase }}, gym routine, workout, fitness{% else %}gym tracking, fitness app, workout tracker, exercise log, fitness routine{% endif %}">
   <meta name="author" content="Fermin Silva">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 
-  <meta property="og:type" content="{% if page.layout == 'rutina-routine' %}article{% else %}website{% endif %}">
-  <meta property="og:title" content="{% if page.name.en %}{{ page.name.en }}{% elsif page.name %}{{ page.name }}{% else %}Rutinario{% endif %} — Gym Routine Tracker">
-  <meta property="og:description" content="{% if page.layout == 'rutina-routine' %}{{ page.name.en | default: page.name }}: {{ _desc_text }}{% else %}Track your gym routines, week by week. A bilingual fitness app for managing workouts.{% endif %}">
+  <meta property="og:type" content="{% if _is_routine_like %}article{% else %}website{% endif %}">
+  <meta property="og:title" content="{% if _page_name_en %}{{ _page_name_en }}{% else %}Rutinario{% endif %} — Gym Routine Tracker">
+  <meta property="og:description" content="{% if _is_routine_like %}{{ _page_name_en }}: {{ _desc_text }}{% else %}Track your gym routines, week by week. A bilingual fitness app for managing workouts.{% endif %}">
   <meta property="og:url" content="{{ site.url }}{{ page.url }}">
   <meta property="og:site_name" content="Rutinario">
 
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="{% if page.name.en %}{{ page.name.en }}{% elsif page.name %}{{ page.name }}{% else %}Rutinario{% endif %}">
-  <meta name="twitter:description" content="{% if page.layout == 'rutina-routine' %}{{ _desc_text }}{% else %}Track your gym routines with Rutinario - a bilingual PWA fitness tracker{% endif %}">
+  <meta name="twitter:title" content="{% if _page_name_en %}{{ _page_name_en }}{% else %}Rutinario{% endif %}">
+  <meta name="twitter:description" content="{% if _is_routine_like %}{{ _desc_text }}{% else %}Track your gym routines with Rutinario - a bilingual PWA fitness tracker{% endif %}">
 
   <link rel="canonical" href="{{ site.url }}{{ page.url }}">
   <link rel="alternate" type="text/html" href="{{ site.url }}/">
@@ -68,7 +93,7 @@
       ]
     }
     </script>
-  {% elsif page.layout == 'rutina-routine' %}
+  {% elsif _is_routine_page %}
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -109,14 +134,29 @@
       ]
     }
     </script>
+  {% elsif _is_weekly_page %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "{{ _page_name_en }} Weekly Progress",
+      "description": "{{ _desc_text }}",
+      "url": "{{ site.url }}{{ page.url }}",
+      "isPartOf": {
+        "@type": "SoftwareApplication",
+        "name": "Rutinario",
+        "url": "{{ site.url }}/"
+      }
+    }
+    </script>
   {% endif %}
 </head>
 <body>
   {% include rutina-navbar.html %}
-  {% if page.layout == 'rutina-routine' %}
+  {% if _is_routine_page %}
     {% include rutina-week-bar.html %}
   {% endif %}
-  <main class="main-content">
+  <main class="main-content{% if _is_weekly_page %} main-content-wide{% endif %}">
     {{ content }}
   </main>
   <script src="{{ '/assets/js/rutina-app.js' | relative_url }}"></script>

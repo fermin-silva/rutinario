@@ -23,6 +23,7 @@
   }
 
   var currentLocale = getLocale();
+  var rerenderPage = null;
 
   function applyLocale() {
     document.documentElement.lang = currentLocale;
@@ -34,11 +35,14 @@
                      el.getAttribute('data-i18n-en');
     }
 
-    var rp = document.querySelector('.routine-page');
-    if (rp) {
-      var rName = rp.getAttribute('data-name-' + currentLocale) ||
-                  rp.getAttribute('data-name-en');
-      if (rName) document.title = rName + ' \u2014 Rutinario';
+    var pageEl = document.querySelector('.routine-page, .weekly-page');
+    if (pageEl) {
+      var rName = pageEl.getAttribute('data-name-' + currentLocale) ||
+                  pageEl.getAttribute('data-name-en');
+      var titleSuffix = pageEl.getAttribute('data-title-suffix-' + currentLocale) || '';
+      if (rName) {
+        document.title = rName + (titleSuffix ? ' \u2014 ' + titleSuffix : '') + ' \u2014 Rutinario';
+      }
     }
   }
 
@@ -52,7 +56,7 @@
         navLinks.classList.remove('open');
         if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
       }
-      if (typeof renderWeek === 'function') renderWeek();
+      if (typeof rerenderPage === 'function') rerenderPage();
     });
   }
 
@@ -68,7 +72,7 @@
   applyLocale();
 
   var truncatedEls = document.querySelectorAll('.truncated');
-  for (var i = 0; i < truncatedEls.length; i++) {
+  for (var t = 0; t < truncatedEls.length; t++) {
     (function (el) {
       if (el.scrollHeight <= el.offsetHeight + 2) {
         el.classList.add('is-expanded');
@@ -82,242 +86,512 @@
           el.removeEventListener('transitionend', cleanup);
         });
       });
-    })(truncatedEls[i]);
+    })(truncatedEls[t]);
   }
 
-  var routinePage = document.querySelector('.routine-page');
-  if (!routinePage) return;
+  var utils = (function () {
+    var DEFAULT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-  var slug = routinePage.dataset.slug;
-  var weekOffset = 0;
+    function startOfDay(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
 
-  var weekLabel = document.querySelector('.week-label');
-  var prevBtn = document.querySelector('.week-prev');
-  var nextBtn = document.querySelector('.week-next');
-  var progressEl = routinePage.querySelector('.routine-progress');
-  var checklistItems = routinePage.querySelectorAll('.exercise-item[data-state-group]');
-  var exerciseSections = routinePage.querySelectorAll('.exercise-section');
-  var collapsibleSection = routinePage.querySelector('.exercise-section[data-collapsible]');
-  var collapsibleToggle = collapsibleSection && collapsibleSection.querySelector('.section-header');
-  var routineStatus = routinePage.querySelector('.routine-status');
+    function addDays(date, days) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+    }
 
-  if (!prevBtn || !nextBtn || !weekLabel) return;
+    function getCurrentWeekMonday(now) {
+      var date = startOfDay(now || new Date());
+      var day = date.getDay();
+      var diff = day === 0 ? -6 : 1 - day;
+      return addDays(date, diff);
+    }
 
-  if (collapsibleSection && collapsibleToggle) {
-    var collapsibleToggleIcon = collapsibleToggle.querySelector('.section-toggle-icon');
+    function getWeekMondayFromOffset(baseMonday, offset) {
+      return addDays(baseMonday, offset * 7);
+    }
 
-    function updateCollapsibleSection() {
-      var collapsed = collapsibleSection.classList.contains('is-collapsed');
-      collapsibleToggle.setAttribute('aria-expanded', String(!collapsed));
-      if (collapsibleToggleIcon) {
-        collapsibleToggleIcon.textContent = collapsed ? '⏷' : '⏶';
+    function getISOWeek(date) {
+      var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+      d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+      var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      var weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+      return d.getUTCFullYear() + '-W' + String(weekNo).padStart(2, '0');
+    }
+
+    function parseISOWeek(isoWeek) {
+      var match = /^(\d{4})-W(\d{2})$/.exec(isoWeek || '');
+      if (!match) return null;
+      var year = Number(match[1]);
+      var week = Number(match[2]);
+      if (!year || week < 1 || week > 53) return null;
+      return { year: year, week: week };
+    }
+
+    function getMondayFromISOWeek(isoWeek) {
+      var parsed = parseISOWeek(isoWeek);
+      if (!parsed) return null;
+      var jan4 = new Date(parsed.year, 0, 4);
+      var weekOneMonday = getCurrentWeekMonday(jan4);
+      return addDays(weekOneMonday, (parsed.week - 1) * 7);
+    }
+
+    function getWeekOffsetFromISOWeek(baseMonday, isoWeek) {
+      var monday = getMondayFromISOWeek(isoWeek);
+      if (!monday) return null;
+      return Math.round((startOfDay(monday) - startOfDay(baseMonday)) / 604800000);
+    }
+
+    function getMonths() {
+      var langData = i18nData[currentLocale] || i18nData[FALLBACK] || {};
+      return langData.months || DEFAULT_MONTHS;
+    }
+
+    function formatWeekLabel(monday, weekText) {
+      var months = getMonths();
+      var sunday = addDays(monday, 6);
+      return weekText + ' ' + monday.getDate() + '/' + months[monday.getMonth()] +
+        ' \u2192 ' + sunday.getDate() + '/' + months[sunday.getMonth()];
+    }
+
+    function formatShortDate(date) {
+      var months = getMonths();
+      return date.getDate() + ' ' + months[date.getMonth()];
+    }
+
+    function formatMonthLabel(date) {
+      var months = getMonths();
+      return months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+
+    function buildStorageKey(slug, isoWeek) {
+      return 'gymlog_' + slug + '_' + isoWeek;
+    }
+
+    function normalizeState(state) {
+      var normalized = {
+        exercises: {},
+        excuses: {}
+      };
+
+      if (!state || typeof state !== 'object') {
+        return normalized;
       }
-    }
 
-    collapsibleToggle.addEventListener('click', function () {
-      collapsibleSection.classList.toggle('is-collapsed');
-      updateCollapsibleSection();
-    });
+      var hasNamespaces = Object.prototype.hasOwnProperty.call(state, 'exercises') ||
+                          Object.prototype.hasOwnProperty.call(state, 'excuses');
 
-    updateCollapsibleSection();
-  }
+      if (hasNamespaces) {
+        if (state.exercises && typeof state.exercises === 'object') {
+          normalized.exercises = state.exercises;
+        }
+        if (state.excuses && typeof state.excuses === 'object') {
+          normalized.excuses = state.excuses;
+        }
+        return normalized;
+      }
 
-  function getMondayOfWeek(offset) {
-    var now = new Date();
-    var day = now.getDay();
-    var diff = day === 0 ? -6 : 1 - day;
-    return new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff + offset * 7);
-  }
+      for (var key in state) {
+        if (Object.prototype.hasOwnProperty.call(state, key)) {
+          normalized.exercises[key] = state[key];
+        }
+      }
 
-  function getISOWeek(date) {
-    var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-    var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    var weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-    return d.getUTCFullYear() + '-W' + String(weekNo).padStart(2, '0');
-  }
-
-  function formatWeekLabel(monday) {
-    var langData = i18nData[currentLocale] || i18nData[FALLBACK] || {};
-    var months = langData.months || ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var weekText = routinePage.dataset['weekLabel' + (currentLocale === 'es' ? 'Es' : 'En')] || 'Week';
-    var sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    var monthStart = months[monday.getMonth()];
-    var monthEnd = months[sunday.getMonth()];
-    return weekText + ' ' + monday.getDate() + '/' + monthStart + ' \u2192 ' + sunday.getDate() + '/' + monthEnd;
-  }
-
-  function storageKey() {
-    return 'gymlog_' + slug + '_' + getISOWeek(getMondayOfWeek(weekOffset));
-  }
-
-  function progressKey() {
-    return storageKey() + '_progress';
-  }
-
-  function loadState() {
-    try {
-      return normalizeState(JSON.parse(localStorage.getItem(storageKey())));
-    } catch (e) {
-      return normalizeState(null);
-    }
-  }
-
-  function saveState(state) {
-    localStorage.setItem(storageKey(), JSON.stringify(normalizeState(state)));
-  }
-
-  function normalizeState(state) {
-    var normalized = {
-      exercises: {},
-      excuses: {}
-    };
-
-    if (!state || typeof state !== 'object') {
       return normalized;
     }
 
-    var hasNamespaces = Object.prototype.hasOwnProperty.call(state, 'exercises') ||
-                        Object.prototype.hasOwnProperty.call(state, 'excuses');
+    function normalizeProgress(progress) {
+      if (!progress || typeof progress !== 'object') return null;
+      var total = typeof progress.total === 'number' ? progress.total : null;
+      var checked = typeof progress.checked === 'number' ? progress.checked : null;
+      var pct = typeof progress.pct === 'number' ? progress.pct : null;
+      if (total === null || checked === null || pct === null) return null;
+      return {
+        total: total,
+        checked: checked,
+        pct: pct
+      };
+    }
 
-    if (hasNamespaces) {
-      if (state.exercises && typeof state.exercises === 'object') {
-        normalized.exercises = state.exercises;
+    function countCheckedItems(items) {
+      var count = 0;
+      for (var key in items) {
+        if (Object.prototype.hasOwnProperty.call(items, key) && items[key]) {
+          count++;
+        }
       }
-      if (state.excuses && typeof state.excuses === 'object') {
-        normalized.excuses = state.excuses;
-      }
-      return normalized;
+      return count;
     }
 
-    for (var key in state) {
-      if (Object.prototype.hasOwnProperty.call(state, key)) {
-        normalized.exercises[key] = state[key];
-      }
+    function hasCheckedItems(items) {
+      return countCheckedItems(items) > 0;
     }
 
-    return normalized;
-  }
-
-  function getItemGroup(item) {
-    return item.dataset.stateGroup || 'exercises';
-  }
-
-  function hasCheckedItems(items) {
-    for (var key in items) {
-      if (Object.prototype.hasOwnProperty.call(items, key) && items[key]) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function loadProgress() {
-    try {
-      return JSON.parse(localStorage.getItem(progressKey())) || null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function saveProgress(progress) {
-    localStorage.setItem(progressKey(), JSON.stringify(progress));
-  }
-
-  window.renderWeek = renderWeek;
-
-  function renderWeek() {
-    var monday = getMondayOfWeek(weekOffset);
-    weekLabel.textContent = formatWeekLabel(monday);
-  }
-
-  function render() {
-    renderWeek();
-    nextBtn.disabled = weekOffset >= 0;
-
-    var state = loadState();
-    var totalItems = 0;
-    var checkedItems = 0;
-
-    for (var i = 0; i < checklistItems.length; i++) {
-      var item = checklistItems[i];
-      var checkbox = item.querySelector('input[type="checkbox"]');
-      var group = getItemGroup(item);
-      var checked = !!state[group][item.dataset.key];
-      checkbox.checked = checked;
-      item.classList.toggle('checked', checked);
-      if (group === 'exercises') {
-        totalItems++;
-        if (checked) checkedItems++;
-      }
-    }
-
-    updateAllProgress(totalItems, checkedItems, state);
-  }
-
-  function updateAllProgress(totalItems, checkedCount, state) {
-    for (var i = 0; i < exerciseSections.length; i++) {
-      var section = exerciseSections[i];
-      var items = section.querySelectorAll('.exercise-item[data-state-group="exercises"]');
-      var sectionCheckedItems = section.querySelectorAll('.exercise-item[data-state-group="exercises"].checked');
-      var counter = section.querySelector('.progress-counter');
-      if (counter) {
-        counter.textContent = sectionCheckedItems.length + ' / ' + items.length;
-      }
-    }
-
-    if (routineStatus) {
-      routineStatus.classList.toggle('has-excuse', hasCheckedItems(state.excuses));
-    }
-
-    if (progressEl) {
+    function getProgress(totalItems, checkedItems, storedProgress) {
       var total = totalItems || 0;
-      var checked = checkedCount || 0;
-      var stored = loadProgress();
-      var pct = stored && stored.total === total && stored.checked === checked && typeof stored.pct === 'number'
+      var checked = checkedItems || 0;
+      var stored = normalizeProgress(storedProgress);
+      var pct = stored && stored.total === total && stored.checked === checked
         ? stored.pct
         : (total ? Math.round((checked / total) * 100) : 0);
-      if (!stored || stored.total !== total || stored.checked !== checked || stored.pct !== pct) {
-        saveProgress({
-          total: total,
-          checked: checked,
-          pct: pct
+
+      return {
+        total: total,
+        checked: checked,
+        pct: pct,
+        stored: stored
+      };
+    }
+
+    function resolveStatus(state, progress) {
+      var normalizedState = normalizeState(state);
+      return {
+        hasExcuse: hasCheckedItems(normalizedState.excuses),
+        isComplete: progress.total > 0 && progress.checked === progress.total
+      };
+    }
+
+    function getRecentMonthGroups(baseDate, totalMonths) {
+      var groups = [];
+      var currentWeekMonday = getCurrentWeekMonday(baseDate);
+
+      for (var monthOffset = 0; monthOffset < totalMonths; monthOffset++) {
+        var monthStart = new Date(baseDate.getFullYear(), baseDate.getMonth() - monthOffset, 1);
+        var monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
+        var firstWeekMonday = getCurrentWeekMonday(monthStart);
+        var weeks = [];
+
+        for (var step = 0; step < 6; step++) {
+          var monday = addDays(firstWeekMonday, step * 7);
+          var sunday = addDays(monday, 6);
+          var intersectsMonth = monday <= monthEnd && sunday >= monthStart;
+
+          if (!intersectsMonth) {
+            if (monday > monthEnd) break;
+            continue;
+          }
+
+          if (monday > currentWeekMonday) {
+            break;
+          }
+
+          if (weeks.length >= 5) break;
+
+          weeks.push({
+            slot: weeks.length + 1,
+            monday: monday,
+            isoWeek: getISOWeek(monday)
+          });
+        }
+
+        groups.push({
+          label: formatMonthLabel(monthStart),
+          weeks: weeks
         });
       }
-      progressEl.textContent = pct + '%';
-      if (routineStatus) {
-        routineStatus.classList.toggle('is-complete', total > 0 && checked === total);
+
+      return groups;
+    }
+
+    return {
+      buildStorageKey: buildStorageKey,
+      countCheckedItems: countCheckedItems,
+      formatMonthLabel: formatMonthLabel,
+      formatShortDate: formatShortDate,
+      formatWeekLabel: formatWeekLabel,
+      getCurrentWeekMonday: getCurrentWeekMonday,
+      getISOWeek: getISOWeek,
+      getProgress: getProgress,
+      getRecentMonthGroups: getRecentMonthGroups,
+      getWeekMondayFromOffset: getWeekMondayFromOffset,
+      getWeekOffsetFromISOWeek: getWeekOffsetFromISOWeek,
+      normalizeProgress: normalizeProgress,
+      normalizeState: normalizeState,
+      resolveStatus: resolveStatus
+    };
+  })();
+
+  var storage = {
+    loadStateForWeek: function (slug, isoWeek) {
+      try {
+        return utils.normalizeState(JSON.parse(localStorage.getItem(utils.buildStorageKey(slug, isoWeek))));
+      } catch (e) {
+        return utils.normalizeState(null);
+      }
+    },
+    saveStateForWeek: function (slug, isoWeek, state) {
+      localStorage.setItem(utils.buildStorageKey(slug, isoWeek), JSON.stringify(utils.normalizeState(state)));
+    },
+    loadProgressForWeek: function (slug, isoWeek) {
+      try {
+        return utils.normalizeProgress(JSON.parse(localStorage.getItem(utils.buildStorageKey(slug, isoWeek) + '_progress')));
+      } catch (e) {
+        return null;
+      }
+    },
+    saveProgressForWeek: function (slug, isoWeek, progress) {
+      localStorage.setItem(utils.buildStorageKey(slug, isoWeek) + '_progress', JSON.stringify(progress));
+    },
+    getWeekSnapshot: function (slug, isoWeek, totalItems) {
+      var state = this.loadStateForWeek(slug, isoWeek);
+      var checkedItems = utils.countCheckedItems(state.exercises);
+      var progress = utils.getProgress(totalItems, checkedItems, this.loadProgressForWeek(slug, isoWeek));
+      return {
+        state: state,
+        progress: progress,
+        status: utils.resolveStatus(state, progress)
+      };
+    },
+    syncProgressForWeek: function (slug, isoWeek, progress) {
+      if (!progress.stored ||
+          progress.stored.total !== progress.total ||
+          progress.stored.checked !== progress.checked ||
+          progress.stored.pct !== progress.pct) {
+        this.saveProgressForWeek(slug, isoWeek, {
+          total: progress.total,
+          checked: progress.checked,
+          pct: progress.pct
+        });
       }
     }
+  };
+
+  function applyStatusClasses(el, status) {
+    if (!el) return;
+    el.classList.toggle('has-excuse', !!status.hasExcuse);
+    el.classList.toggle('is-complete', !!status.isComplete);
   }
 
-  prevBtn.addEventListener('click', function () {
-    weekOffset--;
-    render();
-  });
+  function createWeekStore(slug, getISOWeek) {
+    return {
+      readState: function () {
+        return storage.loadStateForWeek(slug, getISOWeek());
+      },
+      saveState: function (state) {
+        storage.saveStateForWeek(slug, getISOWeek(), state);
+      },
+      getSnapshot: function (totalItems) {
+        return storage.getWeekSnapshot(slug, getISOWeek(), totalItems);
+      },
+      syncProgress: function (progress) {
+        storage.syncProgressForWeek(slug, getISOWeek(), progress);
+      }
+    };
+  }
 
-  nextBtn.addEventListener('click', function () {
-    if (weekOffset < 0) {
-      weekOffset++;
-      render();
+  function initRoutinePage() {
+    var routinePage = document.querySelector('.routine-page');
+    if (!routinePage) return false;
+
+    var slug = routinePage.dataset.slug;
+    var baseMonday = utils.getCurrentWeekMonday(new Date());
+    var weekOffset = 0;
+    var weekStore = createWeekStore(slug, getCurrentISOWeek);
+
+    var weekLabel = document.querySelector('.week-label');
+    var prevBtn = document.querySelector('.week-prev');
+    var nextBtn = document.querySelector('.week-next');
+    var progressEl = routinePage.querySelector('.routine-progress');
+    var checklistItems = routinePage.querySelectorAll('.exercise-item[data-state-group]');
+    var exerciseSections = routinePage.querySelectorAll('.exercise-section');
+    var collapsibleSection = routinePage.querySelector('.exercise-section[data-collapsible]');
+    var collapsibleToggle = collapsibleSection && collapsibleSection.querySelector('.section-header');
+    var routineStatus = routinePage.querySelector('.routine-status');
+
+    if (collapsibleSection && collapsibleToggle) {
+      var collapsibleToggleIcon = collapsibleToggle.querySelector('.section-toggle-icon');
+
+      function updateCollapsibleSection() {
+        var collapsed = collapsibleSection.classList.contains('is-collapsed');
+        collapsibleToggle.setAttribute('aria-expanded', String(!collapsed));
+        if (collapsibleToggleIcon) {
+          collapsibleToggleIcon.textContent = collapsed ? '⏷' : '⏶';
+        }
+      }
+
+      collapsibleToggle.addEventListener('click', function () {
+        collapsibleSection.classList.toggle('is-collapsed');
+        updateCollapsibleSection();
+      });
+
+      updateCollapsibleSection();
     }
-  });
 
-  routinePage.addEventListener('change', function (e) {
-    var target = e.target;
-    if (!target || target.type !== 'checkbox') return;
+    function getCurrentISOWeek() {
+      return utils.getISOWeek(utils.getWeekMondayFromOffset(baseMonday, weekOffset));
+    }
 
-    var item = target.closest('.exercise-item[data-state-group]');
-    if (!item) return;
+    function getItemGroup(item) {
+      return item.dataset.stateGroup || 'exercises';
+    }
 
-    var state = loadState();
-    var group = getItemGroup(item);
-    state[group][item.dataset.key] = target.checked;
-    saveState(state);
+    function resolveInitialWeekOffset() {
+      var params = new URLSearchParams(window.location.search);
+      var requestedWeek = params.get('week');
+      if (!requestedWeek) return 0;
+      var offset = utils.getWeekOffsetFromISOWeek(baseMonday, requestedWeek);
+      if (offset === null || offset > 0) return 0;
+      return offset;
+    }
 
-    render();
-  });
+    function renderWeekLabel() {
+      if (!weekLabel) return;
+      var weekText = routinePage.dataset['weekLabel' + (currentLocale === 'es' ? 'Es' : 'En')] || 'Week';
+      var monday = utils.getWeekMondayFromOffset(baseMonday, weekOffset);
+      weekLabel.textContent = utils.formatWeekLabel(monday, weekText);
+    }
+
+    function updateSectionCounters() {
+      for (var i = 0; i < exerciseSections.length; i++) {
+        var section = exerciseSections[i];
+        var items = section.querySelectorAll('.exercise-item[data-state-group="exercises"]');
+        var checkedItems = section.querySelectorAll('.exercise-item[data-state-group="exercises"].checked');
+        var counter = section.querySelector('.progress-counter');
+        if (counter) {
+          counter.textContent = checkedItems.length + ' / ' + items.length;
+        }
+      }
+    }
+
+    function updateProgress(snapshot) {
+      if (progressEl) {
+        weekStore.syncProgress(snapshot.progress);
+        progressEl.textContent = snapshot.progress.pct + '%';
+      }
+
+      applyStatusClasses(routineStatus, snapshot.status);
+    }
+
+    function syncChecklistState(state) {
+      var totals = {
+        totalItems: 0,
+        checkedItems: 0
+      };
+
+      for (var i = 0; i < checklistItems.length; i++) {
+        var item = checklistItems[i];
+        var checkbox = item.querySelector('input[type="checkbox"]');
+        var group = getItemGroup(item);
+        var checked = !!state[group][item.dataset.key];
+        checkbox.checked = checked;
+        item.classList.toggle('checked', checked);
+
+        if (group === 'exercises') {
+          totals.totalItems++;
+          if (checked) totals.checkedItems++;
+        }
+      }
+
+      return totals;
+    }
+
+    function renderRoutinePage() {
+      renderWeekLabel();
+      if (nextBtn) nextBtn.disabled = weekOffset >= 0;
+
+      var state = weekStore.readState();
+      var totals = syncChecklistState(state);
+      var snapshot = weekStore.getSnapshot(totals.totalItems);
+
+      updateSectionCounters();
+      updateProgress(snapshot);
+    }
+
+    weekOffset = resolveInitialWeekOffset();
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () {
+        weekOffset--;
+        renderRoutinePage();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        if (weekOffset < 0) {
+          weekOffset++;
+          renderRoutinePage();
+        }
+      });
+    }
+
+    routinePage.addEventListener('change', function (e) {
+      var target = e.target;
+      if (!target || target.type !== 'checkbox') return;
+
+      var item = target.closest('.exercise-item[data-state-group]');
+      if (!item) return;
+
+      var state = weekStore.readState();
+      var group = getItemGroup(item);
+      state[group][item.dataset.key] = target.checked;
+      weekStore.saveState(state);
+
+      renderRoutinePage();
+    });
+
+    rerenderPage = renderRoutinePage;
+    renderRoutinePage();
+    return true;
+  }
+
+  function initWeeklyPage() {
+    var weeklyPage = document.querySelector('.weekly-page');
+    if (!weeklyPage) return false;
+
+    var slug = weeklyPage.dataset.slug;
+    var routineUrl = weeklyPage.dataset.routineUrl;
+    var totalExercises = Number(weeklyPage.dataset.totalExercises || 0);
+    var monthsContainer = weeklyPage.querySelector('[data-weekly-months]');
+    var template = document.getElementById('weekly-month-row-template');
+
+    if (!monthsContainer || !template) return false;
+
+    function renderWeeklyPage() {
+      var groups = utils.getRecentMonthGroups(new Date(), 12);
+      monthsContainer.innerHTML = '';
+
+      for (var i = 0; i < groups.length; i++) {
+        var group = groups[i];
+        var fragment = template.content.cloneNode(true);
+        var monthLabel = fragment.querySelector('[data-weekly-month-label]');
+        var weekCells = fragment.querySelectorAll('[data-weekly-week]');
+
+        if (monthLabel) {
+          monthLabel.textContent = group.label;
+        }
+
+        for (var slotIndex = 0; slotIndex < weekCells.length; slotIndex++) {
+          var weekCell = weekCells[slotIndex];
+          var weekData = group.weeks[slotIndex];
+
+          if (!weekData) {
+            weekCell.classList.add('is-hidden');
+            continue;
+          }
+
+          var snapshot = storage.getWeekSnapshot(slug, weekData.isoWeek, totalExercises);
+          var startEl = weekCell.querySelector('[data-weekly-week-start]');
+          var progressEl = weekCell.querySelector('[data-weekly-week-progress]');
+
+          weekCell.href = routineUrl + '?week=' + encodeURIComponent(weekData.isoWeek);
+          weekCell.setAttribute('aria-label', group.label + ' W' + weekData.slot + ' ' + snapshot.progress.pct + '%');
+          applyStatusClasses(weekCell, snapshot.status);
+
+          if (startEl) startEl.textContent = utils.formatShortDate(weekData.monday);
+          if (progressEl) progressEl.textContent = snapshot.progress.pct + '%';
+        }
+
+        monthsContainer.appendChild(fragment);
+      }
+    }
+
+    rerenderPage = renderWeeklyPage;
+    renderWeeklyPage();
+    return true;
+  }
+
+  initRoutinePage() || initWeeklyPage();
 
   var deferredPrompt = null;
   var installBtn = document.createElement('button');
@@ -371,6 +645,4 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () {});
   }
-
-  render();
 })();

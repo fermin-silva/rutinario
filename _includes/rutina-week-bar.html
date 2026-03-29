@@ -1,7 +1,7 @@
 <div class="week-bar">
   <div class="week-bar-inner">
     <button class="week-arrow week-prev" aria-label="Previous week">&#8592;</button>
-    <span class="week-label">...</span>
+    <a class="week-label" href="{{ page.url | append: 'weekly/' | relative_url }}">...</a>
     <button class="week-arrow week-next" aria-label="Next week" disabled>&#8594;</button>
   </div>
 </div>

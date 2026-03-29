@@ -8,6 +8,8 @@ Small Jekyll/GitHub Pages repo for the Rutinario workout tracker. No app framewo
 - App shell: [`_layouts/rutina-default.html`](/Users/ferminsilva/code/rutinario/_layouts/rutina-default.html), [`assets/css/base.css`](/Users/ferminsilva/code/rutinario/assets/css/base.css), [`assets/css/rutina.css`](/Users/ferminsilva/code/rutinario/assets/css/rutina.css), [`assets/js/rutina-app.js`](/Users/ferminsilva/code/rutinario/assets/js/rutina-app.js).
 - Routine renderer: [`_layouts/rutina-routine.html`](/Users/ferminsilva/code/rutinario/_layouts/rutina-routine.html).
 - Routine content lives in [`_routines/fullbody.md`](/Users/ferminsilva/code/rutinario/_routines/fullbody.md) and [`_routines/ppl.md`](/Users/ferminsilva/code/rutinario/_routines/ppl.md).
+- `_routines/` is the source collection for routine documents and shared routine data.
+- `routines/` is the preferred source folder for route-specific pages that hang off a routine URL, such as `/<slug>/weekly/`, so extra pages do not blur the collection model.
 - Shared snippets are in [`_includes/rutina-navbar.html`](/Users/ferminsilva/code/rutinario/_includes/rutina-navbar.html), [`_includes/rutina-week-bar.html`](/Users/ferminsilva/code/rutinario/_includes/rutina-week-bar.html), and [`_includes/info-steps.html`](/Users/ferminsilva/code/rutinario/_includes/info-steps.html).
 
 ## App Areas
