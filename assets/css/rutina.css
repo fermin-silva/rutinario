@@ -192,53 +192,67 @@ body {
 .week-bar-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 1rem;
-  height: 44px;
+  min-height: 52px;
+}
+
+.week-bar-control {
+  color: var(--ink-light);
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.week-bar-control:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.week-bar-control:active:not(:disabled) {
+  background: rgba(60, 42, 33, 0.05);
+  color: var(--ink);
+}
+
+.week-bar-control:focus-visible {
+  outline: 2px solid var(--brown-700);
+  outline-offset: -2px;
+}
+
+.week-bar-control + .week-bar-control {
+  border-left: 1px solid var(--beige-300);
 }
 
 .week-label {
   font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
-  color: var(--ink-light);
   letter-spacing: 0.01em;
-}
-
-a.week-label:hover {
-  color: var(--ink);
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  padding: 0 0.9rem;
+  text-align: center;
 }
 
 .week-arrow {
   font-size: 1.3rem;
-  color: var(--ink-light);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
+  width: 38px;
+  padding: 0;
 }
 
 .week-prev {
-  justify-content: left;
+  justify-content: flex-start;
 }
 
 .week-next {
-  justify-content: right;
-}
-
-.week-arrow:hover:not(:disabled) {
-  background: var(--beige-300);
-  color: var(--ink);
+  justify-content: flex-end;
 }
 
 .week-arrow:disabled {
-  opacity: 0.25;
+  color: rgba(107, 85, 68, 0.25);
   cursor: default;
 }
 
