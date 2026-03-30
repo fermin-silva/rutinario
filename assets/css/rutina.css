@@ -6,11 +6,21 @@
   --brown-700: #7a5c3a;
   --ink: #2a1f14;
   --ink-light: #6b5544;
+  --ink-light-muted: rgba(107, 85, 68, 0.25);
+  --ink-press-overlay: rgba(60, 42, 33, 0.05);
   --accent: #8b4513;
+  --excuse: #a8544e;
+  --excuse-soft: rgba(168, 84, 78, 0.2);
+  --excuse-softer: rgba(168, 84, 78, 0.1);
+  --excuse-bg: rgb(255 17 0 / 6%);
   --navbar-bg: var(--beige-300);
+  --navbar-bg-standalone: rgba(232, 220, 200, 0.92);
   --bg-root: var(--beige-100);
   --border: var(--beige-500);
   --success: #5a7a5a;
+  --shadow-1: 0 4px 16px rgba(42, 31, 20, 0.25);
+  --shadow-2: 0 4px 16px rgba(42, 31, 20, 0.2);
+  --shadow-3: 0 6px 20px rgba(42, 31, 20, 0.25);
   --max-width: 640px;
   --font-heading: 'Playfair Display', Georgia, serif;
 }
@@ -25,7 +35,7 @@ body {
 }
 
 .standalone .navbar {
-  background: rgba(232, 220, 200, 0.92);
+  background: var(--navbar-bg-standalone);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: none;
@@ -139,7 +149,7 @@ body {
 
 .routine-status.has-excuse:not(.is-complete),
 .weekly-week.has-excuse:not(.is-complete) {
-  --status-color: #a8544e;
+  --status-color: var(--excuse);
 }
 
 .routine-status {
@@ -212,7 +222,7 @@ body {
 }
 
 .week-bar-control:active:not(:disabled) {
-  background: rgba(60, 42, 33, 0.05);
+  background: var(--ink-press-overlay);
   color: var(--ink);
 }
 
@@ -252,7 +262,7 @@ body {
 }
 
 .week-arrow:disabled {
-  color: rgba(107, 85, 68, 0.25);
+  color: var(--ink-light-muted);
   cursor: default;
 }
 
@@ -264,15 +274,15 @@ body {
 }
 
 .exercise-section[data-section="excuses"] {
-  --section-border: rgba(168, 84, 78, 0.2);
-  --item-divider: rgba(168, 84, 78, 0.1);
-  --check-color: #a8544e;
+  --section-border: var(--excuse-soft);
+  --item-divider: var(--excuse-softer);
+  --check-color: var(--excuse);
   margin-top: 1.75rem;
   margin-bottom: 0;
   margin-left: -1rem;
   margin-right: -1rem;
   padding: 0.1rem 1rem 0.25rem;
-  background: rgb(255 17 0 / 6%);
+  background: var(--excuse-bg);
   border-radius: 0;
 }
 
@@ -523,7 +533,7 @@ body {
   font-size: 0.85rem;
   padding: 0.6rem 0.9rem;
   border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(42, 31, 20, 0.25);
+  box-shadow: var(--shadow-1);
   z-index: 200;
   max-width: 220px;
   line-height: 1.4;
@@ -547,14 +557,14 @@ body {
   font-weight: 600;
   padding: 0.7rem 1.1rem;
   border-radius: 50px;
-  box-shadow: 0 4px 16px rgba(42, 31, 20, 0.2);
+  box-shadow: var(--shadow-2);
   transition: transform 0.15s, box-shadow 0.15s;
   z-index: 90;
 }
 
 .install-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(42, 31, 20, 0.25);
+  box-shadow: var(--shadow-3);
 }
 
 .install-btn.visible {
