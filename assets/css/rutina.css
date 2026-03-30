@@ -6,11 +6,21 @@
   --brown-700: #7a5c3a;
   --ink: #2a1f14;
   --ink-light: #6b5544;
+  --ink-light-muted: rgba(107, 85, 68, 0.25);
+  --ink-press-overlay: rgba(60, 42, 33, 0.05);
   --accent: #8b4513;
+  --excuse: #a8544e;
+  --excuse-soft: rgba(168, 84, 78, 0.2);
+  --excuse-softer: rgba(168, 84, 78, 0.1);
+  --excuse-bg: rgb(255 17 0 / 6%);
   --navbar-bg: var(--beige-300);
+  --navbar-bg-standalone: rgba(232, 220, 200, 0.92);
   --bg-root: var(--beige-100);
   --border: var(--beige-500);
   --success: #5a7a5a;
+  --shadow-1: 0 4px 16px rgba(42, 31, 20, 0.25);
+  --shadow-2: 0 4px 16px rgba(42, 31, 20, 0.2);
+  --shadow-3: 0 6px 20px rgba(42, 31, 20, 0.25);
   --max-width: 640px;
   --font-heading: 'Playfair Display', Georgia, serif;
 }
@@ -25,7 +35,7 @@ body {
 }
 
 .standalone .navbar {
-  background: rgba(232, 220, 200, 0.92);
+  background: var(--navbar-bg-standalone);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: none;
@@ -126,21 +136,27 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.routine-status {
+.routine-status,
+.weekly-week {
   --status-color: var(--ink-light);
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
   color: var(--status-color);
-  white-space: nowrap;
 }
 
-.routine-status.is-complete {
+.routine-status.is-complete,
+.weekly-week.is-complete {
   --status-color: var(--success);
 }
 
-.routine-status.has-excuse:not(.is-complete) {
-  --status-color: #a8544e;
+.routine-status.has-excuse:not(.is-complete),
+.weekly-week.has-excuse:not(.is-complete) {
+  --status-color: var(--excuse);
+}
+
+.routine-status {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .routine-status-icon {
@@ -186,49 +202,67 @@ body {
 .week-bar-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 1rem;
-  height: 44px;
+  min-height: 52px;
+}
+
+.week-bar-control {
+  color: var(--ink-light);
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.week-bar-control:hover:not(:disabled) {
+  color: var(--ink);
+}
+
+.week-bar-control:active:not(:disabled) {
+  background: var(--ink-press-overlay);
+  color: var(--ink);
+}
+
+.week-bar-control:focus-visible {
+  outline: 2px solid var(--brown-700);
+  outline-offset: -2px;
+}
+
+.week-bar-control + .week-bar-control {
+  border-left: 1px solid var(--beige-300);
 }
 
 .week-label {
   font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
-  color: var(--ink-light);
   letter-spacing: 0.01em;
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  padding: 0 0.9rem;
+  text-align: center;
 }
 
 .week-arrow {
   font-size: 1.3rem;
-  color: var(--ink-light);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
+  width: 38px;
+  padding: 0;
 }
 
 .week-prev {
-  justify-content: left;
+  justify-content: flex-start;
 }
 
 .week-next {
-  justify-content: right;
-}
-
-.week-arrow:hover:not(:disabled) {
-  background: var(--beige-300);
-  color: var(--ink);
+  justify-content: flex-end;
 }
 
 .week-arrow:disabled {
-  opacity: 0.25;
+  color: var(--ink-light-muted);
   cursor: default;
 }
 
@@ -240,15 +274,15 @@ body {
 }
 
 .exercise-section[data-section="excuses"] {
-  --section-border: rgba(168, 84, 78, 0.2);
-  --item-divider: rgba(168, 84, 78, 0.1);
-  --check-color: #a8544e;
+  --section-border: var(--excuse-soft);
+  --item-divider: var(--excuse-softer);
+  --check-color: var(--excuse);
   margin-top: 1.75rem;
   margin-bottom: 0;
   margin-left: -1rem;
   margin-right: -1rem;
   padding: 0.1rem 1rem 0.25rem;
-  background: rgb(255 17 0 / 6%);
+  background: var(--excuse-bg);
   border-radius: 0;
 }
 
@@ -258,6 +292,90 @@ body {
 
 .exercise-section[data-section="excuses"] .exercise-list {
   margin-top: 0;
+}
+
+.weekly-header {
+  margin-bottom: 1.25rem;
+}
+
+.weekly-subtitle {
+  margin-top: 0.2rem;
+}
+
+.weekly-month-row {
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+
+.weekly-month-row:last-child {
+  margin-bottom: 0;
+}
+
+.weekly-month-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+}
+
+.weekly-week {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem;
+  padding: 0.62rem 0.4rem 0.66rem;
+  border: 1px solid var(--beige-300);
+  transition: background 0.15s, color 0.15s;
+  text-align: center;
+}
+
+.weekly-week + .weekly-week {
+  margin-left: -1px;
+}
+
+.weekly-week:hover {
+  background: var(--beige-200);
+}
+
+.weekly-week.is-hidden {
+  display: none;
+}
+
+.weekly-month-row > .section-label {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.weekly-week-start,
+.weekly-week-progress {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.weekly-week-start {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.weekly-week[aria-current="date"] .weekly-week-start {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.16em;
+}
+
+.weekly-week-progress {
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 .section-header {
@@ -415,7 +533,7 @@ body {
   font-size: 0.85rem;
   padding: 0.6rem 0.9rem;
   border-radius: 10px;
-  box-shadow: 0 4px 16px rgba(42, 31, 20, 0.25);
+  box-shadow: var(--shadow-1);
   z-index: 200;
   max-width: 220px;
   line-height: 1.4;
@@ -439,14 +557,14 @@ body {
   font-weight: 600;
   padding: 0.7rem 1.1rem;
   border-radius: 50px;
-  box-shadow: 0 4px 16px rgba(42, 31, 20, 0.2);
+  box-shadow: var(--shadow-2);
   transition: transform 0.15s, box-shadow 0.15s;
   z-index: 90;
 }
 
 .install-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(42, 31, 20, 0.25);
+  box-shadow: var(--shadow-3);
 }
 
 .install-btn.visible {

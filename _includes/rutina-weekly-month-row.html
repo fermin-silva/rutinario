@@ -1,0 +1,11 @@
+<section class="weekly-month-row" data-weekly-month-row>
+  <h2 class="section-label" data-weekly-month-label></h2>
+  <div class="weekly-month-grid" data-weekly-month-grid>
+    {% for slot in (1..5) %}
+    <a class="weekly-week" href="#" data-weekly-week>
+      <span class="weekly-week-start" data-weekly-week-start>--</span>
+      <span class="weekly-week-progress" data-weekly-week-progress>0%</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
