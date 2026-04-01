@@ -7,7 +7,7 @@
   {% if page.routine_slug %}
     {% assign _routine_doc = site.routines | where: "slug", page.routine_slug | first %}
   {% endif %}
-  {% assign _page_name_en = _routine_doc.name.en | default: _routine_doc.name | default: page.name.en | default: page.name %}
+  {% assign _page_name_en = _routine_doc.name.en | default: _routine_doc.name | default: page.name.en %}
   {% assign _is_routine_page = false %}
   {% assign _is_weekly_page = false %}
   {% assign _is_routine_like = false %}
@@ -21,7 +21,7 @@
   {% endif %}
   {% assign _title_suffix = '' %}
   {% if _is_weekly_page %}
-    {% assign _title_suffix = ' — Weekly' %}
+    {% assign _title_suffix = ' — Monthly Progress' %}
   {% endif %}
   <title>{% if _page_name_en %}{{ _page_name_en }}{{ _title_suffix }} — {% endif %}Rutinario</title>
 
