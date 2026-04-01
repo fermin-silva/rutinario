@@ -262,7 +262,7 @@
       var currentWeekMonday = getCurrentWeekMonday(baseDate);
 
       for (var monthOffset = 0; monthOffset < totalMonths; monthOffset++) {
-        var monthStart = new Date(baseDate.getFullYear(), baseDate.getMonth() - monthOffset, 1);
+        var monthStart = new Date(currentWeekMonday.getFullYear(), currentWeekMonday.getMonth() - monthOffset, 1);
         var monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
         var firstWeekMonday = getMondayOnOrAfter(monthStart);
         var lastWeekMonday = getCurrentWeekMonday(monthEnd);
