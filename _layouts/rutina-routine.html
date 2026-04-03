@@ -9,6 +9,15 @@ week_label:
 section_excuses:
   en: Excuses
   es: Excusas
+filter_all:
+  en: All
+  es: Todo
+filter_pending:
+  en: Pending
+  es: Pendiente
+filter_completed:
+  en: Done
+  es: Hecho
 ---
 
 <div class="routine-page" data-slug="{{ page.slug }}"
@@ -23,11 +32,6 @@ section_excuses:
         data-i18n-es="{{ page.name.es | default: page.name }}">
       {{ page.name.en | default: page.name }}
     </h1>
-    <div class="routine-status" aria-live="polite">
-      {% assign percentage_logo = page['percentage-logo'] | default: 'muscle' %}
-      {% include rutina-percentage-symbols.html percentage_logo=percentage_logo %}
-      <span class="routine-progress">0%</span>
-    </div>
   </div>
   {% if page.desc %}
   <div class="routine-desc truncated">
@@ -38,6 +42,26 @@ section_excuses:
     {% endfor %}
   </div>
   {% endif %}
+
+  <div class="filter-bar">
+    <div class="filter-tabs" role="group">
+      {% include rutina-filter-icon.html %}
+      <button class="filter-tab is-active" data-filter="all"
+              data-i18n-en="{{ layout.filter_all.en }}"
+              data-i18n-es="{{ layout.filter_all.es }}">{{ layout.filter_all.en }}</button>
+      <button class="filter-tab" data-filter="pending"
+              data-i18n-en="{{ layout.filter_pending.en }}"
+              data-i18n-es="{{ layout.filter_pending.es }}">{{ layout.filter_pending.en }}</button>
+      <button class="filter-tab" data-filter="completed"
+              data-i18n-en="{{ layout.filter_completed.en }}"
+              data-i18n-es="{{ layout.filter_completed.es }}">{{ layout.filter_completed.en }}</button>
+    </div>
+    <div class="routine-status" aria-live="polite">
+      {% assign percentage_logo = page['percentage-logo'] | default: 'muscle' %}
+      {% include rutina-percentage-symbols.html percentage_logo=percentage_logo %}
+      <span class="routine-progress">0 / 0</span>
+    </div>
+  </div>
 
   {% assign excuses = site.data.excuses %}
 

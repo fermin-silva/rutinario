@@ -389,6 +389,8 @@
     var collapsibleSection = routinePage.querySelector('.exercise-section[data-collapsible]');
     var collapsibleToggle = collapsibleSection && collapsibleSection.querySelector('.section-header');
     var routineStatus = routinePage.querySelector('.routine-status');
+    var filterTabs = routinePage.querySelectorAll('.filter-tab');
+    var currentFilter = 'all';
 
     if (collapsibleSection && collapsibleToggle) {
       var collapsibleToggleIcon = collapsibleToggle.querySelector('.section-toggle-icon');
@@ -408,6 +410,16 @@
 
       updateCollapsibleSection();
     }
+
+    [].forEach.call(filterTabs, function (tab) {
+      tab.addEventListener('click', function () {
+        currentFilter = tab.dataset.filter;
+        [].forEach.call(filterTabs, function (t) {
+          t.classList.toggle('is-active', t === tab);
+        });
+        applyFilter();
+      });
+    });
 
     function getCurrentISOWeek() {
       return utils.getISOWeek(utils.getWeekMondayFromOffset(baseMonday, weekOffset));
@@ -445,12 +457,23 @@
       }
     }
 
+    function applyFilter() {
+      var items = routinePage.querySelectorAll('.exercise-item[data-state-group="exercises"]');
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var checked = item.classList.contains('checked');
+        var show = currentFilter === 'all' ||
+                   (currentFilter === 'pending' && !checked) ||
+                   (currentFilter === 'completed' && checked);
+        item.style.display = show ? '' : 'none';
+      }
+    }
+
     function updateProgress(snapshot) {
       if (progressEl) {
         weekStore.syncProgress(snapshot.progress);
-        progressEl.textContent = snapshot.progress.pct + '%';
+        progressEl.textContent = snapshot.progress.checked + ' / ' + snapshot.progress.total;
       }
-
       applyStatusClasses(routineStatus, snapshot.status);
     }
 
@@ -487,6 +510,7 @@
 
       updateSectionCounters();
       updateProgress(snapshot);
+      applyFilter();
     }
 
     weekOffset = resolveInitialWeekOffset();
