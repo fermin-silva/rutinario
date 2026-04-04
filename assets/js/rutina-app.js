@@ -94,7 +94,9 @@
     }
 
     function shouldIgnoreToggle(target) {
-      return !!(target && target.closest('a, button, input, select, textarea, summary, label'));
+      if (!target) return false;
+      if (toggle.contains(target)) return false;
+      return !!target.closest('a, button, input, select, textarea, summary, label');
     }
 
     function toggleCollapsed() {
