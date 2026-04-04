@@ -6,9 +6,15 @@ section_exercises:
 week_label:
   en: Week
   es: Semana
+routine_instruction:
+  en: Do the routine and check off each exercise when you finish. Click the weekly selector to change the week, or click the week to see your yearly progress.
+  es: Hacé la rutina y marcá cada ejercicio cuando termines. Tocá el selector semanal para cambiar de semana, o tocá la semana para ver tu progreso anual.
 section_excuses:
   en: Excuses
   es: Excusas
+section_excuses_subtitle:
+  en: What kept you from finishing?
+  es: ¿Qué te impidió completarla?
 filter_all:
   en: All
   es: Todo
@@ -33,15 +39,22 @@ filter_completed:
       {{ page.name.en | default: page.name }}
     </h1>
   </div>
-  {% if page.desc %}
-  <div class="routine-desc truncated">
+  <div class="routine-desc truncated is-collapsed"
+       data-collapsible="true"
+       role="button"
+       tabindex="0"
+       aria-expanded="false">
+    {% if page.desc %}
     {% for p in page.desc %}
     <p class="routine-subtitle"
        data-i18n-en="{{ p.en }}"
        data-i18n-es="{{ p.es }}">{{ p.en }}</p>
     {% endfor %}
+    {% endif %}
+    <p class="routine-subtitle"
+       data-i18n-en="{{ layout.routine_instruction.en }}"
+       data-i18n-es="{{ layout.routine_instruction.es }}">{{ layout.routine_instruction.en }}</p>
   </div>
-  {% endif %}
 
   <div class="filter-bar">
     <div class="filter-tabs" role="group">
@@ -134,10 +147,18 @@ filter_completed:
             type="button"
             aria-expanded="false"
             aria-controls="excuses-list">
-      <span class="section-label"
-            data-i18n-en="{{ layout.section_excuses.en }}"
-            data-i18n-es="{{ layout.section_excuses.es }}">{{ layout.section_excuses.en }}</span>
-      <span class="section-toggle-icon" aria-hidden="true">⏷</span>
+      <span class="section-heading">
+        <span class="section-label"
+              data-i18n-en="{{ layout.section_excuses.en }}"
+              data-i18n-es="{{ layout.section_excuses.es }}">{{ layout.section_excuses.en }}</span>
+        <span class="section-subtitle"
+              data-i18n-en="{{ layout.section_excuses_subtitle.en }}"
+              data-i18n-es="{{ layout.section_excuses_subtitle.es }}">{{ layout.section_excuses_subtitle.en }}</span>
+      </span>
+      <span class="section-toggle-icon"
+            aria-hidden="true"
+            data-collapsed-icon="⏷"
+            data-expanded-icon="⏶">⏷</span>
     </button>
     <div class="exercise-list" id="excuses-list">
       {% for excuse in excuses %}

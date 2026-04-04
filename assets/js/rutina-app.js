@@ -71,22 +71,50 @@
 
   applyLocale();
 
-  var truncatedEls = document.querySelectorAll('.truncated');
-  for (var t = 0; t < truncatedEls.length; t++) {
-    (function (el) {
-      if (el.scrollHeight <= el.offsetHeight + 2) {
-        el.classList.add('is-expanded');
-        return;
+  function initCollapsible(options) {
+    var container = options.container;
+    var toggle = options.toggle || container;
+    var icon = options.icon || null;
+
+    if (!container || !toggle) return;
+
+    function isCollapsed() {
+      return container.classList.contains('is-collapsed');
+    }
+
+    function sync() {
+      var collapsed = isCollapsed();
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+
+      if (icon) {
+        var collapsedIcon = icon.getAttribute('data-collapsed-icon') || '';
+        var expandedIcon = icon.getAttribute('data-expanded-icon') || collapsedIcon;
+        icon.textContent = collapsed ? collapsedIcon : expandedIcon;
       }
-      el.addEventListener('click', function () {
-        el.style.maxHeight = el.scrollHeight + 'px';
-        el.classList.add('is-expanded');
-        el.addEventListener('transitionend', function cleanup() {
-          el.style.maxHeight = '';
-          el.removeEventListener('transitionend', cleanup);
-        });
+    }
+
+    function toggleCollapsed() {
+      container.classList.toggle('is-collapsed');
+      sync();
+    }
+
+    if (toggle.tagName !== 'BUTTON') {
+      toggle.addEventListener('keydown', function (event) {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        toggleCollapsed();
       });
-    })(truncatedEls[t]);
+    }
+
+    toggle.addEventListener('click', toggleCollapsed);
+    sync();
+  }
+
+  var selfCollapsibles = document.querySelectorAll('.truncated[data-collapsible]');
+  for (var t = 0; t < selfCollapsibles.length; t++) {
+    initCollapsible({
+      container: selfCollapsibles[t]
+    });
   }
 
   var utils = (function () {
@@ -386,30 +414,21 @@
     var progressEl = routinePage.querySelector('.routine-progress');
     var checklistItems = routinePage.querySelectorAll('.exercise-item[data-state-group]');
     var exerciseSections = routinePage.querySelectorAll('.exercise-section');
-    var collapsibleSection = routinePage.querySelector('.exercise-section[data-collapsible]');
-    var collapsibleToggle = collapsibleSection && collapsibleSection.querySelector('.section-header');
     var routineStatus = routinePage.querySelector('.routine-status');
     var filterTabs = routinePage.querySelectorAll('.filter-tab');
     var currentFilter = 'all';
 
-    if (collapsibleSection && collapsibleToggle) {
-      var collapsibleToggleIcon = collapsibleToggle.querySelector('.section-toggle-icon');
+    var collapsibleSections = routinePage.querySelectorAll('.exercise-section[data-collapsible]');
+    [].forEach.call(collapsibleSections, function (section) {
+      var toggle = section.querySelector('.section-header');
+      if (!toggle) return;
 
-      function updateCollapsibleSection() {
-        var collapsed = collapsibleSection.classList.contains('is-collapsed');
-        collapsibleToggle.setAttribute('aria-expanded', String(!collapsed));
-        if (collapsibleToggleIcon) {
-          collapsibleToggleIcon.textContent = collapsed ? '⏷' : '⏶';
-        }
-      }
-
-      collapsibleToggle.addEventListener('click', function () {
-        collapsibleSection.classList.toggle('is-collapsed');
-        updateCollapsibleSection();
+      initCollapsible({
+        container: section,
+        toggle: toggle,
+        icon: toggle.querySelector('.section-toggle-icon')
       });
-
-      updateCollapsibleSection();
-    }
+    });
 
     [].forEach.call(filterTabs, function (tab) {
       tab.addEventListener('click', function () {
@@ -458,14 +477,42 @@
     }
 
     function applyFilter() {
-      var items = routinePage.querySelectorAll('.exercise-item[data-state-group="exercises"]');
-      for (var i = 0; i < items.length; i++) {
-        var item = items[i];
-        var checked = item.classList.contains('checked');
-        var show = currentFilter === 'all' ||
-                   (currentFilter === 'pending' && !checked) ||
-                   (currentFilter === 'completed' && checked);
-        item.style.display = show ? '' : 'none';
+      var lists = routinePage.querySelectorAll('.exercise-list');
+      for (var i = 0; i < lists.length; i++) {
+        var list = lists[i];
+        var children = list.children;
+        var activeLabel = null;
+        var labelHasVisibleItems = false;
+
+        for (var j = 0; j < children.length; j++) {
+          var node = children[j];
+
+          if (node.classList.contains('exercise-label')) {
+            if (activeLabel) {
+              activeLabel.style.display = labelHasVisibleItems ? '' : 'none';
+            }
+            activeLabel = node;
+            labelHasVisibleItems = false;
+            continue;
+          }
+
+          if (!node.classList.contains('exercise-item') || getItemGroup(node) !== 'exercises') {
+            continue;
+          }
+
+          var checked = node.classList.contains('checked');
+          var show = currentFilter === 'all' ||
+                     (currentFilter === 'pending' && !checked) ||
+                     (currentFilter === 'completed' && checked);
+          node.style.display = show ? '' : 'none';
+          if (show && activeLabel) {
+            labelHasVisibleItems = true;
+          }
+        }
+
+        if (activeLabel) {
+          activeLabel.style.display = labelHasVisibleItems ? '' : 'none';
+        }
       }
     }
 

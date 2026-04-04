@@ -156,13 +156,15 @@ a.content-item:hover {
   --truncate-height: 3em;
   --truncate-fade: #fff;
   position: relative;
-  max-height: var(--truncate-height);
-  overflow: hidden;
   cursor: pointer;
-  transition: max-height 0.3s ease;
 }
 
-.truncated::after {
+.truncated.is-collapsed {
+  max-height: var(--truncate-height);
+  overflow: hidden;
+}
+
+.truncated.is-collapsed::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -171,14 +173,12 @@ a.content-item:hover {
   height: 2.5em;
   background: linear-gradient(transparent, var(--truncate-fade));
   pointer-events: none;
-  transition: opacity 0.2s ease;
 }
 
-.truncated.is-expanded {
+.truncated:not(.is-collapsed) {
   max-height: none;
-  cursor: default;
 }
 
-.truncated.is-expanded::after {
+.truncated:not(.is-collapsed)::after {
   opacity: 0;
 }
