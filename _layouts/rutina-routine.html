@@ -6,9 +6,12 @@ section_exercises:
 week_label:
   en: Week
   es: Semana
-routine_instruction:
-  en: Do the routine and check off each exercise when you finish. Click the weekly selector to change the week, or click the week to see your yearly progress.
-  es: Hacé la rutina y marcá cada ejercicio cuando termines. Tocá el selector semanal para cambiar de semana, o tocá la semana para ver tu progreso anual.
+routine_instruction_prefix:
+  en: Do the routine and check off each exercise when you finish. Click the weekly selector to change the week, or click the week to see
+  es: Hacé la rutina y marcá cada ejercicio cuando termines. Tocá el selector semanal para cambiar de semana, o tocá la semana para ver
+routine_instruction_link:
+  en: your yearly progress
+  es: tu progreso anual
 section_excuses:
   en: Excuses
   es: Excusas
@@ -51,9 +54,14 @@ filter_completed:
        data-i18n-es="{{ p.es }}">{{ p.en }}</p>
     {% endfor %}
     {% endif %}
-    <p class="routine-subtitle"
-       data-i18n-en="{{ layout.routine_instruction.en }}"
-       data-i18n-es="{{ layout.routine_instruction.es }}">{{ layout.routine_instruction.en }}</p>
+    <p class="routine-subtitle">
+      <span data-i18n-en="{{ layout.routine_instruction_prefix.en }}"
+            data-i18n-es="{{ layout.routine_instruction_prefix.es }}">{{ layout.routine_instruction_prefix.en }}</span>
+      <a class="routine-inline-link"
+         href="{{ page.url | append: 'weekly/' | relative_url }}"
+         data-i18n-en="{{ layout.routine_instruction_link.en }}"
+         data-i18n-es="{{ layout.routine_instruction_link.es }}">{{ layout.routine_instruction_link.en }}</a>.
+    </p>
   </div>
 
   <div class="filter-bar">
