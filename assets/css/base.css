@@ -118,7 +118,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  padding-left: 1.25rem;
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
 }
@@ -133,7 +132,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   display: block;
   border: 1px solid transparent;
   border-radius: 12px;
-  padding: 1.25rem;
+  padding: 0.95rem 1.1rem;
   transition: border-color 0.2s;
 }
 
@@ -144,12 +143,31 @@ a.content-item:hover {
 .content-item-title {
   font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 0.125rem;
+  margin-bottom: 0.45rem;
 }
 
 .content-item-desc {
   font-size: 0.875rem;
   line-height: 1.5;
+}
+
+.routine-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+.routine-meta-part {
+  white-space: nowrap;
+}
+
+.routine-meta-spacer {
+  width: 1.15rem;
+  flex: 0 0 1.15rem;
 }
 
 .truncated {

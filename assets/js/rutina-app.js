@@ -93,6 +93,12 @@
       }
     }
 
+    function shouldIgnoreToggle(target) {
+      if (!target) return false;
+      if (toggle.contains(target)) return false;
+      return !!target.closest('a, button, input, select, textarea, summary, label');
+    }
+
     function toggleCollapsed() {
       container.classList.toggle('is-collapsed');
       sync();
@@ -106,7 +112,10 @@
       });
     }
 
-    toggle.addEventListener('click', toggleCollapsed);
+    toggle.addEventListener('click', function (event) {
+      if (shouldIgnoreToggle(event.target)) return;
+      toggleCollapsed();
+    });
     sync();
   }
 
