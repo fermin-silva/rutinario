@@ -85,21 +85,36 @@ how_it_works_steps:
           data-i18n-es="{{ routine.name.es | default: routine.name }}">
         {{ routine.name.en | default: routine.name }}
       </div>
-      <div class="content-item-desc">
-        {% if routine.type == "flat" %}
-          <span data-i18n-en="{{ routine.exercises | size }} {{ page.card_exercises.en }}"
-                data-i18n-es="{{ routine.exercises | size }} {{ page.card_exercises.es }}">
-            {{ routine.exercises | size }} {{ page.card_exercises.en }}
+      <div class="content-item-desc routine-meta">
+        {% if routine.days %}
+          <span class="routine-meta-part routine-meta-days"
+              data-i18n-en="{{ routine.days }}d"
+              data-i18n-es="{{ routine.days }}d">
+            {{ routine.days }}d
           </span>
-        {% elsif routine.type == "by_day" %}
-          <span data-i18n-en="{{ routine.days | size }} {{ page.card_days.en }}"
-                data-i18n-es="{{ routine.days | size }} {{ page.card_days.es }}">
-            {{ routine.days | size }} {{ page.card_days.en }}
+        {% endif %}
+        {% assign routine_audience_en = routine.audience.en | default: routine.audience %}
+        {% assign routine_audience_es = routine.audience.es | default: routine.audience %}
+        {% if routine_audience_en %}
+          {% if routine.days %}
+            <span class="routine-meta-spacer" aria-hidden="true"></span>
+          {% endif %}
+          <span class="routine-meta-part routine-meta-audience"
+              data-i18n-en="{{ routine_audience_en }}"
+              data-i18n-es="{{ routine_audience_es }}">
+            {{ routine_audience_en }}
           </span>
-        {% elsif routine.type == "by_group" %}
-          <span data-i18n-en="{{ routine.groups | size }} {{ page.card_groups.en }}"
-                data-i18n-es="{{ routine.groups | size }} {{ page.card_groups.es }}">
-            {{ routine.groups | size }} {{ page.card_groups.en }}
+        {% endif %}
+        {% assign routine_focus_en = routine.focus.en | default: routine.focus %}
+        {% assign routine_focus_es = routine.focus.es | default: routine.focus %}
+        {% if routine_focus_en %}
+          {% if routine.days or routine_audience_en %}
+            <span class="routine-meta-spacer" aria-hidden="true"></span>
+          {% endif %}
+          <span class="routine-meta-part routine-meta-focus"
+              data-i18n-en="{{ routine_focus_en }}"
+              data-i18n-es="{{ routine_focus_es }}">
+            {{ routine_focus_en }}
           </span>
         {% endif %}
       </div>

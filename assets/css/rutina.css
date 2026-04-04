@@ -117,6 +117,7 @@ body {
 
 .content-item-title { color: var(--ink); }
 .content-item-desc { color: var(--ink-light); }
+.routine-meta { color: var(--ink-light); }
 
 .routine-page {
   padding-top: 0.5rem;

@@ -1,10 +1,14 @@
 ---
 name:
   en: Push Pull Legs
-  es: Empuje Jalón Piernas
+  es: Empuje Tirón Piernas
+days: 3
+focus:
+  en: Hypertrophy / Recovery
+  es: Hipertrofia / Recuperación
 desc:
-  - en: "Three-day split by movement pattern. Push, pull, and legs, each with its own session."
-    es: "División de tres días por patrón de movimiento. Empuje, jalón y piernas, cada uno en su sesión."
+  - en: "Three-day split by movement pattern focused on hypertrophy and recovery."
+    es: "División de tres días por patrón de movimiento enfocada en hipertrofia y recuperación."
 slug: ppl
 percentage-logo: muscle
 exercises:
@@ -26,7 +30,7 @@ exercises:
 
   - group:
       en: Pull
-      es: Jalón
+      es: Tirón
   - id: pull-ups
     en: Pull Ups
     es: Dominadas
