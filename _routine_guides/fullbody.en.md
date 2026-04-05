@@ -10,30 +10,47 @@ permalink: /en/routines/fullbody/guide/
 
 {% assign routine = site.routines | where: "slug", page.routine_slug | first %}
 {% assign routine_name = routine.name[page.lang] | default: routine.name %}
-{% assign routine_desc = routine.desc[0][page.lang] | default: routine.desc[0].en %}
 {% assign tracker_url = routine.url | relative_url %}
 
-## How to follow this routine
+![{{ routine_name }}]({{ '/assets/img/fullbody-deadlift-640.webp' | relative_url }})
+
+## How to use this full body routine
 
 1. Open the routine: [{{ routine_name }}]({{ tracker_url }})
-2. Follow the exercises
+2. Follow the exercises in the weekly order you use
 3. Tap each one when done
 4. Repeat next week
 
-{{ routine_desc }}
 
-## What this routine is for
+## Who this routine is for
 
-This {{ routine_name }} routine is built for lifters who want frequent exposure to the main compound lifts while still keeping enough room for targeted accessory work. It works well when you want a simple structure and steady strength-oriented progression.
+This {{ routine_name }} routine is for people who want to train the whole body several times per week, with a focus on strength and hypertrophy.
 
-## Who should use it
+It works best if you can train 3 or 4 days per week and want to practice the main lifts frequently.
 
-Use it if you can train three to four times per week and you prefer repeating the big patterns across the week instead of splitting muscles into separate days.
+## How this routine works
 
-## How to run it
+Each week combines:
 
-Keep the main compounds as the priority lifts of each session. Use accessory work to cover weak points, add volume where recovery allows, and keep fatigue under control.
+- Heavy compounds like squats, deadlifts, presses, and pull-ups
+- Accessories to build volume in legs, chest, back, and arms
+
+Training 3 or 4 days per week is ideal for this routine. In each session, prioritize 3 or 4 compounds so you do not overload your back, and distribute accessory work through the week based on preference.
+
+## Simple rules
+
+- Prioritize heavy compounds in each session
+- Use accessories to add volume without interfering with the main lifts
+- If you run short on time or fatigue builds up, cut accessories first
 
 ## What to watch
 
-If your lower back, elbows, or shoulders accumulate too much fatigue, reduce accessory volume first before changing the core lifts.
+If fatigue builds up in your lower back, shoulders, or elbows:
+
+- reduce accessory volume
+- keep the main compounds in place
+- avoid failing every exercise
+
+## Start using this routine
+
+→ [{{ routine_name }}]({{ tracker_url }})

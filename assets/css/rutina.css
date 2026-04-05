@@ -272,10 +272,6 @@ body {
   padding-top: 0.5rem;
 }
 
-.guide-actions {
-  margin-bottom: 1rem;
-}
-
 .guide-body {
   color: var(--ink);
 }
@@ -322,6 +318,14 @@ body {
   color: var(--ink);
 }
 
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.75rem 0 1rem;
+  border-radius: 12px;
+}
+
 .prose-content p {
   margin: 0 0 0.85rem;
 }
@@ -333,6 +337,16 @@ body {
 .prose-content ul,
 .prose-content ol {
   padding-left: 1.25rem;
+  margin: 0 0 0.85rem;
+}
+
+.prose-content ul:last-child,
+.prose-content ol:last-child {
+  margin-bottom: 0;
+}
+
+.prose-content li:last-child {
+  margin-bottom: 0;
 }
 
 .routine-subtitle:last-child {

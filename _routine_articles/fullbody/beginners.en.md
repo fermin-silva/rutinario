@@ -6,7 +6,7 @@ title: For Beginners
 description: A simpler entry point with less fatigue and fewer decisions.
 excerpt: A lighter starting version.
 order: 1
-permalink: /en/routines/fullbody/guide/for-beginners/
+permalink: /en/routines/fullbody/for-beginners/
 ---
 
 Start with fewer hard sets than the default template and keep exercise selection narrow. The goal is to practice the big lifts consistently before adding more volume.

@@ -10,30 +10,54 @@ permalink: /es/routines/fullbody/guia/
 
 {% assign routine = site.routines | where: "slug", page.routine_slug | first %}
 {% assign routine_name = routine.name[page.lang] | default: routine.name %}
-{% assign routine_desc = routine.desc[0][page.lang] | default: routine.desc[0].en %}
 {% assign tracker_url = routine.url | relative_url %}
 
-## Como seguir esta rutina
+![{{ routine_name }}]({{ '/assets/img/fullbody-deadlift-640.webp' | relative_url }})
+
+## Como usar esta rutina full body
 
 1. Abri la rutina: [{{ routine_name }}]({{ tracker_url }})
-2. Segui los ejercicios
+2. Segui los ejercicios de la lista segun tu distribucion semanal
 3. Tocá cada uno cuando lo termines
 4. Repeti la semana siguiente
 
-{{ routine_desc }}
 
-## Para que sirve esta rutina
+## Para quien es esta rutina
 
-Esta rutina {{ routine_name }} esta pensada para quienes quieren repetir los compuestos principales varias veces por semana sin perder espacio para accesorios utiles.
+Esta rutina {{ routine_name }} es para quienes quieren entrenar todo el cuerpo varias veces por semana, con foco en fuerza e hipertrofia.
 
-## Para quien conviene
+Funciona mejor si podes entrenar 3 o 4 dias por semana y queres practicar los movimientos principales con frecuencia.
 
-Conviene si podes entrenar tres o cuatro veces por semana y preferis una estructura simple, con practica frecuente de los movimientos grandes.
+## Como funciona la rutina
 
-## Como usarla
+Cada semana combina:
 
-Los compuestos tienen que ser la prioridad de cada sesion. Los accesorios sirven para sumar volumen, atacar puntos debiles y regular la fatiga.
+- Compuestos pesados (sentadilla, peso muerto, press, dominadas)
+- Accesorios para sumar volumen en piernas, pecho, espalda y brazos
+
+Entrenar 3 o 4 dias por semana es ideal para esta rutina. En cada sesion, prioriza 3 o 4 compuestos para evitar sobrecargar la espalda y distribui los accesorios a lo largo de la semana segun preferencia.
+
+## Reglas simples
+
+- Prioriza los compuestos pesados en cada sesion
+- Usa accesorios para sumar volumen sin afectar los principales
+- Si falta tiempo o hay fatiga, recorta accesorios primero
 
 ## Que mirar
 
-Si se acumula demasiada fatiga en espalda baja, codos u hombros, recorta primero el volumen accesorio antes de tocar los ejercicios base.
+Si se acumula fatiga en espalda baja, hombros o codos:
+
+- reduci volumen en accesorios
+- mantene los compuestos principales
+- evita fallar en todos los ejercicios
+
+## Adaptaciones
+
+- 3 dias por semana
+- En casa
+- Solo mancuernas
+- Principiantes
+
+## Empezar
+
+→ [{{ routine_name }}]({{ tracker_url }})
