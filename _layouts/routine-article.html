@@ -1,0 +1,28 @@
+---
+layout: rutina-default
+back_to_guide:
+  en: Back to guide
+  es: Volver a la guia
+---
+{% assign guide = site.routine_guides | where: "routine_slug", page.routine_slug | where: "lang", page.lang | first %}
+
+<article class="guide-page">
+  <div class="routine-header">
+    <h1 class="routine-title">{{ page.title }}</h1>
+  </div>
+  {% if page.description %}
+  <p class="routine-subtitle">{{ page.description }}</p>
+  {% endif %}
+
+  {% if guide %}
+  <div class="guide-actions">
+    <a class="routine-inline-link" href="{{ guide.url | relative_url }}"
+       data-i18n-en="{{ layout.back_to_guide.en }}"
+       data-i18n-es="{{ layout.back_to_guide.es }}">{{ layout.back_to_guide.en }}</a>
+  </div>
+  {% endif %}
+
+  <div class="guide-body prose-content">
+    {{ content }}
+  </div>
+</article>
