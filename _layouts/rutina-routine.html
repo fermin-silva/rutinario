@@ -1,5 +1,8 @@
 ---
 layout: rutina-default
+guide_label:
+  en: Guide
+  es: Guia
 section_exercises:
   en: Exercises
   es: Ejercicios
@@ -28,6 +31,8 @@ filter_completed:
   en: Done
   es: Hecho
 ---
+{% assign guide_en = site.routine_guides | where: "routine_slug", page.slug | where: "lang", "en" | first %}
+{% assign guide_es = site.routine_guides | where: "routine_slug", page.slug | where: "lang", "es" | first %}
 
 <div class="routine-page" data-slug="{{ page.slug }}"
      data-name-en="{{ page.name.en | default: page.name }}"
@@ -62,6 +67,16 @@ filter_completed:
          data-i18n-en="{{ layout.routine_instruction_link.en }}"
          data-i18n-es="{{ layout.routine_instruction_link.es }}">{{ layout.routine_instruction_link.en }}</a>.
     </p>
+    {% if guide_en or guide_es %}
+    <p class="routine-subtitle">
+      <a class="routine-inline-link"
+         href="{{ guide_en.url | default: guide_es.url | relative_url }}"
+         {% if guide_en %}data-href-en="{{ guide_en.url | relative_url }}"{% endif %}
+         {% if guide_es %}data-href-es="{{ guide_es.url | relative_url }}"{% endif %}
+         data-i18n-en="{{ layout.guide_label.en }}"
+         data-i18n-es="{{ layout.guide_label.es }}">{{ layout.guide_label.en }}</a>
+    </p>
+    {% endif %}
   </div>
 
   <div class="filter-bar">
