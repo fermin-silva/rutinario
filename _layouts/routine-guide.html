@@ -2,18 +2,17 @@
 layout: rutina-default
 section_related:
     en: More for this routine
-    es: Mas sobre esta rutina
+    es: Más sobre esta rutina
 back_to_tracker:
     en: Start tracking this Routine
     es: Empezar a seguir esta Rutina
 ---
 
 {% assign routine = site.routines | where: "slug", page.routine_slug | first %}
-{% assign routine_name = routine.name[page.lang] | default: routine.name %} {%
-assign tracker_url = routine.url | relative_url %} {% assign article_docs =
-site.routine_articles | where: "routine_slug", page.routine_slug | where:
-"lang", page.lang | sort_natural: "title" | sort: "order" %} {% assign
-related_docs = article_docs | where_exp: "doc", "doc.url != page.url" %}
+{% assign routine_name = routine.name[page.lang] | default: routine.name %}
+{% assign tracker_url = routine.url | relative_url %}
+{% assign article_docs = site.routine_articles | where: "routine_slug", page.routine_slug | where: "lang", page.lang | sort_natural: "title" | sort: "order" %}
+{% assign related_docs = article_docs | where_exp: "doc", "doc.url != page.url" %}
 
 <article class="guide-page">
     <div class="routine-header">

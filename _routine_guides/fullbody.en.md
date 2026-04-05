@@ -10,6 +10,17 @@ permalink: /en/routines/fullbody/guide/
 
 {% assign routine = site.routines | where: "slug", page.routine_slug | first %}
 {% assign routine_name = routine.name[page.lang] | default: routine.name %}
+{% assign routine_desc = routine.desc[0][page.lang] | default: routine.desc[0].en %}
+{% assign tracker_url = routine.url | relative_url %}
+
+## How to follow this routine
+
+1. Open the routine: [{{ routine_name }}]({{ tracker_url }})
+2. Follow the exercises
+3. Tap each one when done
+4. Repeat next week
+
+{{ routine_desc }}
 
 ## What this routine is for
 
