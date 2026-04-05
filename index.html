@@ -29,9 +29,6 @@ card_guide:
 section_guides:
   en: Guides
   es: Guías
-guides_intro:
-  en: Read the main guide for each routine in your current language.
-  es: Leé la guía principal de cada rutina en tu idioma actual.
 
 section_how_it_works:
   en: How It Works
@@ -144,22 +141,17 @@ how_it_works_steps:
       data-i18n-es="{{ page.section_guides.es }}">
     {{ page.section_guides.en }}
   </h2>
-  <p class="routine-subtitle"
-     data-i18n-en="{{ page.guides_intro.en }}"
-     data-i18n-es="{{ page.guides_intro.es }}">
-    {{ page.guides_intro.en }}
-  </p>
   <div class="content-list">
     {% for routine in site.routines %}
-      {% assign routine_guide_en = guides_en | where: "routine_slug", routine.slug | first %}
-      {% assign routine_guide_es = guides_es | where: "routine_slug", routine.slug | first %}
-      {% if routine_guide_en or routine_guide_es %}
-      {% assign guide_url = routine_guide_en.url | default: routine_guide_es.url | relative_url %}
-      {% assign guide_title_en = routine_guide_en.title | default: routine.name.en | default: routine.name %}
-      {% assign guide_title_es = routine_guide_es.title | default: routine.name.es | default: routine.name %}
-      {% assign guide_excerpt_en = routine_guide_en.excerpt | default: routine_guide_en.description | default: '' %}
-      {% assign guide_excerpt_es = routine_guide_es.excerpt | default: routine_guide_es.description | default: '' %}
-      <a href="{{ guide_url }}" class="content-item"
+    {% assign routine_guide_en = guides_en | where: "routine_slug", routine.slug | first %}
+    {% assign routine_guide_es = guides_es | where: "routine_slug", routine.slug | first %}
+    {% if routine_guide_en or routine_guide_es %}
+    {% assign guide_url = routine_guide_en.url | default: routine_guide_es.url | relative_url %}
+    {% assign guide_title_en = routine.name.en | default: routine.name %}
+    {% assign guide_title_es = routine.name.es | default: routine.name %}
+    {% assign guide_excerpt_en = routine_guide_en.excerpt | default: routine_guide_en.description | default: '' %}
+    {% assign guide_excerpt_es = routine_guide_es.excerpt | default: routine_guide_es.description | default: '' %}
+    <a href="{{ guide_url }}" class="content-item"
          {% if routine_guide_en %}data-href-en="{{ routine_guide_en.url | relative_url }}"{% endif %}
          {% if routine_guide_es %}data-href-es="{{ routine_guide_es.url | relative_url }}"{% endif %}>
         <div class="content-item-title"

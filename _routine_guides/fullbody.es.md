@@ -2,15 +2,18 @@
 routine_slug: fullbody
 translation_key: guide-fullbody
 lang: es
-title: Guia Full Body
-description: Entende para quien sirve la rutina Full Body, como usarla semana a semana y que contenidos complementarios leer despues.
-excerpt: Como usar la rutina Full Body y cuando conviene.
+title: Guia
+description: Entende para quien sirve esta rutina, como usarla semana a semana y que contenidos complementarios leer despues.
+excerpt: Como usar esta rutina y cuando conviene.
 permalink: /es/routines/fullbody/guia/
 ---
 
+{% assign routine = site.routines | where: "slug", page.routine_slug | first %}
+{% assign routine_name = routine.name[page.lang] | default: routine.name %}
+
 ## Para que sirve esta rutina
 
-Esta rutina Full Body esta pensada para quienes quieren repetir los compuestos principales varias veces por semana sin perder espacio para accesorios utiles.
+Esta rutina {{ routine_name }} esta pensada para quienes quieren repetir los compuestos principales varias veces por semana sin perder espacio para accesorios utiles.
 
 ## Para quien conviene
 

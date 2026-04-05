@@ -14,7 +14,7 @@ Push Pull Legs sirve cuando queres dias mas definidos y una gestion de fatiga ma
 
 ## Para quien conviene
 
-Le viene bien a quienes prefieren un dia de empuje, uno de tiron y uno de piernas en lugar de repetir full body en cada entrenamiento.
+Le viene bien a quienes prefieren un dia de empuje, uno de tiron y uno de piernas en lugar de repetir Cuerpo Completo Intenso en cada entrenamiento.
 
 ## Como usarla
 
@@ -22,4 +22,4 @@ Cada dia tiene que funcionar como un bloque enfocado. Manten los ejercicios base
 
 ## Que mirar
 
-Si empezas a saltear sesiones seguido, la rutina pierde balance rapido. En ese caso conviene simplificar la semana o pasar a una estructura full body.
+Si empezas a saltear sesiones seguido, la rutina pierde balance rapido. En ese caso conviene simplificar la semana o pasar a una estructura Cuerpo Completo Intenso.

@@ -10,7 +10,13 @@
   {% assign _locale_url_en = '' %}
   {% assign _locale_url_es = '' %}
   {% assign _page_name_en = '' %}
-  {% if page.title %}
+  {% if page.layout == 'routine-guide' and _routine_doc and _routine_doc.name %}
+    {% if _routine_doc.name.en %}
+      {% assign _page_name_en = _routine_doc.name.en %}
+    {% else %}
+      {% assign _page_name_en = _routine_doc.name %}
+    {% endif %}
+  {% elsif page.title %}
     {% if page.title.en %}
       {% assign _page_name_en = page.title.en %}
     {% else %}

@@ -3,8 +3,8 @@ routine_slug: fullbody
 translation_key: fullbody-beginners
 lang: en
 title: For Beginners
-description: A simpler Full Body entry point with less fatigue and fewer decisions.
-excerpt: A lighter starting version of Full Body.
+description: A simpler entry point with less fatigue and fewer decisions.
+excerpt: A lighter starting version.
 order: 1
 permalink: /en/routines/fullbody/guide/for-beginners/
 ---
