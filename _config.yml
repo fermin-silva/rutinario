@@ -7,11 +7,21 @@ collections:
   routines:
     output: true
     permalink: /routines/:slug/
+  routine_guides:
+    output: true
+  routine_articles:
+    output: true
 
 defaults:
   - scope: { path: "", type: routines }
     values:
       layout: rutina-routine
+  - scope: { path: "", type: routine_guides }
+    values:
+      layout: routine-guide
+  - scope: { path: "", type: routine_articles }
+    values:
+      layout: routine-article
 
 plugins:
   - jekyll-feed

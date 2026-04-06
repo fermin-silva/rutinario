@@ -7,9 +7,37 @@
   {% if page.routine_slug %}
     {% assign _routine_doc = site.routines | where: "slug", page.routine_slug | first %}
   {% endif %}
-  {% assign _page_name_en = _routine_doc.name.en | default: _routine_doc.name | default: page.name.en %}
+  {% assign _locale_url_en = '' %}
+  {% assign _locale_url_es = '' %}
+  {% assign _page_name_en = '' %}
+  {% if page.layout == 'routine-guide' and _routine_doc and _routine_doc.name %}
+    {% if _routine_doc.name.en %}
+      {% assign _page_name_en = _routine_doc.name.en %}
+    {% else %}
+      {% assign _page_name_en = _routine_doc.name %}
+    {% endif %}
+  {% elsif page.title %}
+    {% if page.title.en %}
+      {% assign _page_name_en = page.title.en %}
+    {% else %}
+      {% assign _page_name_en = page.title %}
+    {% endif %}
+  {% elsif page.name %}
+    {% if page.name.en %}
+      {% assign _page_name_en = page.name.en %}
+    {% else %}
+      {% assign _page_name_en = page.name %}
+    {% endif %}
+  {% elsif _routine_doc and _routine_doc.name %}
+    {% if _routine_doc.name.en %}
+      {% assign _page_name_en = _routine_doc.name.en %}
+    {% else %}
+      {% assign _page_name_en = _routine_doc.name %}
+    {% endif %}
+  {% endif %}
   {% assign _is_routine_page = false %}
   {% assign _is_weekly_page = false %}
+  {% assign _is_editorial_page = false %}
   {% assign _is_routine_like = false %}
   {% if page.layout == 'rutina-routine' %}
     {% assign _is_routine_page = true %}
@@ -18,6 +46,22 @@
   {% if page.layout == 'rutina-weekly' %}
     {% assign _is_weekly_page = true %}
     {% assign _is_routine_like = true %}
+  {% endif %}
+  {% if page.layout == 'routine-guide' or page.layout == 'routine-article' %}
+    {% assign _is_editorial_page = true %}
+  {% endif %}
+  {% if page.layout == 'routine-guide' %}
+    {% assign _editorial_docs = site.routine_guides | where: "routine_slug", page.routine_slug %}
+    {% assign _locale_doc_en = _editorial_docs | where: "lang", "en" | first %}
+    {% assign _locale_doc_es = _editorial_docs | where: "lang", "es" | first %}
+    {% assign _locale_url_en = _locale_doc_en.url | default: '' %}
+    {% assign _locale_url_es = _locale_doc_es.url | default: '' %}
+  {% elsif page.layout == 'routine-article' %}
+    {% assign _editorial_docs = site.routine_articles | where: "translation_key", page.translation_key %}
+    {% assign _locale_doc_en = _editorial_docs | where: "lang", "en" | first %}
+    {% assign _locale_doc_es = _editorial_docs | where: "lang", "es" | first %}
+    {% assign _locale_url_en = _locale_doc_en.url | default: '' %}
+    {% assign _locale_url_es = _locale_doc_es.url | default: '' %}
   {% endif %}
   {% assign _title_suffix = '' %}
   {% if _is_weekly_page %}
@@ -30,21 +74,23 @@
     {% assign _desc_text = page.desc | map: 'en' | join: ' ' %}
   {% elsif _is_weekly_page and _routine_doc %}
     {% assign _desc_text = _routine_doc.desc | map: 'en' | join: ' ' %}
+  {% elsif _is_editorial_page %}
+    {% assign _desc_text = page.description | default: page.excerpt | default: site.description %}
   {% endif %}
-  <meta name="description" content="{% if _is_routine_like %}{{ _page_name_en }}: {{ _desc_text }}{% else %}Rutinario: Track your gym routines, week by week. Bilingual fitness app with customizable workout tracking.{% endif %}">
-  <meta name="keywords" content="{% if _is_routine_like %}{{ _page_name_en | downcase }}, gym routine, workout, fitness{% else %}gym tracking, fitness app, workout tracker, exercise log, fitness routine{% endif %}">
+  <meta name="description" content="{% if _is_routine_like or _is_editorial_page %}{{ _page_name_en }}: {{ _desc_text }}{% else %}Rutinario: Track your gym routines, week by week. Bilingual fitness app with customizable workout tracking.{% endif %}">
+  <meta name="keywords" content="{% if _is_routine_like or _is_editorial_page %}{{ _page_name_en | downcase }}, gym routine, workout, fitness{% else %}gym tracking, fitness app, workout tracker, exercise log, fitness routine{% endif %}">
   <meta name="author" content="Fermin Silva">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 
-  <meta property="og:type" content="{% if _is_routine_like %}article{% else %}website{% endif %}">
+  <meta property="og:type" content="{% if _is_routine_like or _is_editorial_page %}article{% else %}website{% endif %}">
   <meta property="og:title" content="{% if _page_name_en %}{{ _page_name_en }}{% else %}Rutinario{% endif %} — Gym Routine Tracker">
-  <meta property="og:description" content="{% if _is_routine_like %}{{ _page_name_en }}: {{ _desc_text }}{% else %}Track your gym routines, week by week. A bilingual fitness app for managing workouts.{% endif %}">
+  <meta property="og:description" content="{% if _is_routine_like or _is_editorial_page %}{{ _page_name_en }}: {{ _desc_text }}{% else %}Track your gym routines, week by week. A bilingual fitness app for managing workouts.{% endif %}">
   <meta property="og:url" content="{{ site.url }}{{ page.url }}">
   <meta property="og:site_name" content="Rutinario">
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="{% if _page_name_en %}{{ _page_name_en }}{% else %}Rutinario{% endif %}">
-  <meta name="twitter:description" content="{% if _is_routine_like %}{{ _desc_text }}{% else %}Track your gym routines with Rutinario - a bilingual PWA fitness tracker{% endif %}">
+  <meta name="twitter:description" content="{% if _is_routine_like or _is_editorial_page %}{{ _desc_text }}{% else %}Track your gym routines with Rutinario - a bilingual PWA fitness tracker{% endif %}">
 
   <link rel="canonical" href="{{ site.url }}{{ page.url }}">
   <link rel="alternate" type="text/html" href="{{ site.url }}/">
@@ -149,9 +195,29 @@
       }
     }
     </script>
+  {% elsif _is_editorial_page %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "{{ _page_name_en }}",
+      "description": "{{ _desc_text }}",
+      "url": "{{ site.url }}{{ page.url }}",
+      "inLanguage": "{{ page.lang | default: 'en' }}",
+      "author": {
+        "@type": "Person",
+        "name": "Fermin Silva"
+      },
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Rutinario",
+        "url": "{{ site.url }}/"
+      }
+    }
+    </script>
   {% endif %}
 </head>
-<body>
+<body{% if _locale_url_en != '' %} data-locale-url-en="{{ _locale_url_en | relative_url }}"{% endif %}{% if _locale_url_es != '' %} data-locale-url-es="{{ _locale_url_es | relative_url }}"{% endif %}{% if page.lang %} data-page-lang="{{ page.lang }}"{% endif %}>
   {% include rutina-navbar.html %}
   {% if _is_routine_page %}
     {% include rutina-week-bar.html %}

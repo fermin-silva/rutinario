@@ -23,6 +23,11 @@
   }
 
   var currentLocale = getLocale();
+  var pageLang = document.body && document.body.getAttribute('data-page-lang');
+  if (pageLang && SUPPORTED.indexOf(pageLang) !== -1) {
+    currentLocale = pageLang;
+    setLocale(currentLocale);
+  }
   var rerenderPage = null;
 
   function applyLocale() {
@@ -33,6 +38,17 @@
       var el = els[i];
       el.innerHTML = el.getAttribute('data-i18n-' + currentLocale) ||
                      el.getAttribute('data-i18n-en');
+    }
+
+    var links = document.querySelectorAll('[data-href-en], [data-href-es]');
+    for (var j = 0; j < links.length; j++) {
+      var link = links[j];
+      var localizedHref = link.getAttribute('data-href-' + currentLocale) ||
+        link.getAttribute('data-href-en') ||
+        link.getAttribute('data-href-es');
+      if (localizedHref) {
+        link.setAttribute('href', localizedHref);
+      }
     }
 
     var pageEl = document.querySelector('.routine-page, .weekly-page');
@@ -51,6 +67,11 @@
     langSwitch.addEventListener('click', function () {
       currentLocale = currentLocale === 'en' ? 'es' : 'en';
       setLocale(currentLocale);
+      var localizedPageUrl = document.body.getAttribute('data-locale-url-' + currentLocale);
+      if (localizedPageUrl && localizedPageUrl !== window.location.pathname) {
+        window.location.href = localizedPageUrl;
+        return;
+      }
       applyLocale();
       if (navLinks) {
         navLinks.classList.remove('open');

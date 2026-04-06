@@ -1,0 +1,60 @@
+---
+layout: rutina-default
+section_related:
+    en: More for this routine
+    es: Más sobre esta rutina
+back_to_tracker:
+    en: Start tracking this Routine
+    es: Empezar a seguir esta Rutina
+---
+
+{% assign routine = site.routines | where: "slug", page.routine_slug | first %}
+{% assign routine_name = routine.name[page.lang] | default: routine.name %}
+{% assign tracker_url = routine.url | relative_url %}
+{% assign article_docs = site.routine_articles | where: "routine_slug", page.routine_slug | where: "lang", page.lang | sort_natural: "title" | sort: "order" %}
+{% assign related_docs = article_docs | where_exp: "doc", "doc.url != page.url" %}
+
+<article class="guide-page">
+    <div class="routine-header">
+        <h1 class="routine-title">{{ routine_name }}</h1>
+    </div>
+    <div class="routine-desc">
+        {% if page.description %}
+        <p class="routine-subtitle">{{ page.description }}</p>
+        {% endif %}
+        <p class="routine-subtitle">
+            <a
+                class="routine-inline-link"
+                href="{{ tracker_url }}"
+                data-i18n-en="{{ layout.back_to_tracker.en }}"
+                data-i18n-es="{{ layout.back_to_tracker.es }}"
+                >{{ layout.back_to_tracker.en }}</a
+            >
+        </p>
+    </div>
+
+    <div class="guide-body prose-content">{{ content }}</div>
+
+    {% if related_docs.size > 0 %}
+    <section class="section section--spaced">
+        <h2
+            class="section-label"
+            data-i18n-en="{{ layout.section_related.en }}"
+            data-i18n-es="{{ layout.section_related.es }}"
+        >
+            {{ layout.section_related.en }}
+        </h2>
+        <div class="content-list">
+            {% for doc in related_docs %}
+            <a href="{{ doc.url | relative_url }}" class="content-item">
+                <div class="content-item-title">{{ doc.title }}</div>
+                {% assign item_excerpt = doc.excerpt | default: doc.description
+                %} {% if item_excerpt %}
+                <div class="content-item-desc">{{ item_excerpt }}</div>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</article>

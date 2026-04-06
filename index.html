@@ -23,6 +23,12 @@ card_days:
 card_groups:
   en: groups
   es: grupos
+card_guide:
+  en: Guide
+  es: Guia
+section_guides:
+  en: Guides
+  es: Guías
 
 section_how_it_works:
   en: How It Works
@@ -57,6 +63,8 @@ how_it_works_steps:
       en: <p>Rutinario works offline and requires no login. If you train regularly, open your routine and install it to your home screen for quick access. All data stays on your device.</p>
       es: <p>Rutinario funciona sin conexión y no requiere registro. Si entrenás seguido, abrí tu rutina e instalala en la pantalla de inicio para acceder rápido. Todos los datos quedan en tu dispositivo.</p>
 ---
+{% assign guides_en = site.routine_guides | where: "lang", "en" %}
+{% assign guides_es = site.routine_guides | where: "lang", "es" %}
 
 <div class="hero">
   <h1 class="hero-title"
@@ -79,10 +87,12 @@ how_it_works_steps:
   </h2>
   <div class="content-list">
   {% for routine in site.routines %}
+    {% assign routine_guide_en = guides_en | where: "routine_slug", routine.slug | first %}
+    {% assign routine_guide_es = guides_es | where: "routine_slug", routine.slug | first %}
     <a href="{{ routine.url | relative_url }}" class="content-item">
       <div class="content-item-title"
-          data-i18n-en="{{ routine.name.en | default: routine.name }}"
-          data-i18n-es="{{ routine.name.es | default: routine.name }}">
+        data-i18n-en="{{ routine.name.en | default: routine.name }}"
+        data-i18n-es="{{ routine.name.es | default: routine.name }}">
         {{ routine.name.en | default: routine.name }}
       </div>
       <div class="content-item-desc routine-meta">
@@ -124,3 +134,40 @@ how_it_works_steps:
 </div>
 
 {% include info-steps.html title=page.section_how_it_works steps=page.how_it_works_steps %}
+
+<div class="section section--spaced">
+  <h2 class="section-label"
+      data-i18n-en="{{ page.section_guides.en }}"
+      data-i18n-es="{{ page.section_guides.es }}">
+    {{ page.section_guides.en }}
+  </h2>
+  <div class="content-list">
+    {% for routine in site.routines %}
+    {% assign routine_guide_en = guides_en | where: "routine_slug", routine.slug | first %}
+    {% assign routine_guide_es = guides_es | where: "routine_slug", routine.slug | first %}
+    {% if routine_guide_en or routine_guide_es %}
+    {% assign guide_url = routine_guide_en.url | default: routine_guide_es.url | relative_url %}
+    {% assign guide_title_en = routine.name.en | default: routine.name %}
+    {% assign guide_title_es = routine.name.es | default: routine.name %}
+    {% assign guide_excerpt_en = routine_guide_en.excerpt | default: routine_guide_en.description | default: '' %}
+    {% assign guide_excerpt_es = routine_guide_es.excerpt | default: routine_guide_es.description | default: '' %}
+    <a href="{{ guide_url }}" class="content-item"
+         {% if routine_guide_en %}data-href-en="{{ routine_guide_en.url | relative_url }}"{% endif %}
+         {% if routine_guide_es %}data-href-es="{{ routine_guide_es.url | relative_url }}"{% endif %}>
+        <div class="content-item-title"
+             data-i18n-en="{{ guide_title_en | escape }}"
+             data-i18n-es="{{ guide_title_es | escape }}">
+          {{ guide_title_en }}
+        </div>
+        {% if guide_excerpt_en %}
+        <div class="content-item-desc"
+             data-i18n-en="{{ guide_excerpt_en | escape }}"
+             data-i18n-es="{{ guide_excerpt_es | escape }}">
+          {{ guide_excerpt_en }}
+        </div>
+        {% endif %}
+      </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>

@@ -27,7 +27,15 @@ filter_pending:
 filter_completed:
   en: Done
   es: Hecho
+guide_prompt:
+  en: Have doubts? Check the
+  es: ¿Tenés dudas? Revisá la
+guide_prompt_link:
+  en: guide
+  es: guia
 ---
+{% assign guide_en = site.routine_guides | where: "routine_slug", page.slug | where: "lang", "en" | first %}
+{% assign guide_es = site.routine_guides | where: "routine_slug", page.slug | where: "lang", "es" | first %}
 
 <div class="routine-page" data-slug="{{ page.slug }}"
      data-name-en="{{ page.name.en | default: page.name }}"
@@ -175,5 +183,18 @@ filter_completed:
       {% endfor %}
     </div>
   </div>
+  {% endif %}
+
+  {% if guide_en or guide_es %}
+  <p class="routine-subtitle routine-guide-link-row">
+    <span data-i18n-en="{{ layout.guide_prompt.en }}"
+          data-i18n-es="{{ layout.guide_prompt.es }}">{{ layout.guide_prompt.en }}</span>
+    <a class="routine-inline-link"
+       href="{{ guide_en.url | default: guide_es.url | relative_url }}"
+       {% if guide_en %}data-href-en="{{ guide_en.url | relative_url }}"{% endif %}
+       {% if guide_es %}data-href-es="{{ guide_es.url | relative_url }}"{% endif %}
+       data-i18n-en="{{ layout.guide_prompt_link.en }}"
+       data-i18n-es="{{ layout.guide_prompt_link.es }}">{{ layout.guide_prompt_link.en }}</a>.
+  </p>
   {% endif %}
 </div>
